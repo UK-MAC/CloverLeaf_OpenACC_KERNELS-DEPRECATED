@@ -63,13 +63,17 @@ SUBROUTINE PdV_kernel(predict,                                          &
   REAL(KIND=8)  :: recip_volume,energy_change,min_cell_volume
   REAL(KIND=8)  :: right_flux,left_flux,top_flux,bottom_flux,total_flux
 
-!$OMP PARALLEL
+!$ACC DATA &
+!$ACC PRESENT(density0,energy0,pressure,viscosity,volume,xarea,xvel0,yarea,yvel0) &
+!$ACC PRESENT(density1,energy1) &
+!$ACC PRESENT(volume_change)
 
   IF(predict)THEN
 
-!$OMP DO PRIVATE(right_flux,left_flux,top_flux,bottom_flux,total_flux,min_cell_volume, &
-!$OMP            energy_change,recip_volume)
+!$ACC PARALLEL LOOP PRIVATE(right_flux,left_flux,top_flux,bottom_flux,total_flux,min_cell_volume, &
+!$ACC                       energy_change,recip_volume)
     DO k=y_min,y_max
+!$ACC LOOP VECTOR
       DO j=x_min,x_max
 
         left_flux=  (xarea(j  ,k  )*(xvel0(j  ,k  )+xvel0(j  ,k+1)                     &
@@ -98,13 +102,14 @@ SUBROUTINE PdV_kernel(predict,                                          &
 
       ENDDO
     ENDDO
-!$OMP END DO
+!$ACC END PARALLEL LOOP
 
   ELSE
 
-!$OMP DO PRIVATE(right_flux,left_flux,top_flux,bottom_flux,total_flux,min_cell_volume, &
-!$OMP            energy_change,recip_volume)
+!$ACC PARALLEL LOOP PRIVATE(right_flux,left_flux,top_flux,bottom_flux,total_flux,min_cell_volume, &
+!$ACC                       energy_change,recip_volume)
     DO k=y_min,y_max
+!$ACC LOOP VECTOR
       DO j=x_min,x_max
 
         left_flux=  (xarea(j  ,k  )*(xvel0(j  ,k  )+xvel0(j  ,k+1)                     &
@@ -133,11 +138,11 @@ SUBROUTINE PdV_kernel(predict,                                          &
 
       ENDDO
     ENDDO
-!$OMP END DO
+!$ACC END PARALLEL LOOP
 
   ENDIF
 
-!$OMP END PARALLEL
+!$ACC END DATA
 
 END SUBROUTINE PdV_kernel
 

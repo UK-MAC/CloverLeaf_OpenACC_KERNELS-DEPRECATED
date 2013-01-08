@@ -54,6 +54,7 @@ SUBROUTINE calc_dt_kernel(x_min,x_max,y_min,y_max,             &
                           small)
 
   IMPLICIT NONE
+!DIR$ INLINENEVER calc_dt_kernel
 
   INTEGER :: x_min,x_max,y_min,y_max
   REAL(KIND=8)  :: g_small,g_big,dtmin,dt_min_val
@@ -82,14 +83,15 @@ SUBROUTINE calc_dt_kernel(x_min,x_max,y_min,y_max,             &
 
   REAL(KIND=8)     :: div,dsx,dsy,dtut,dtvt,dtct,dtdivt,cc,dv1,dv2,jk_control
 
-!$OMP PARALLEL
 
   small=0
+!$ACC DATA    &
+!$ACC PRESENT(celldx,celldy,cellx,celly,density0,soundspeed,viscosity,volume,xarea,xvel0,yarea,yvel0,dt_min)
 
   dt_min_val = g_big
   jk_control=1.1
 
-!$OMP DO PRIVATE(dsx,dsy,cc,dv1,dv2,div,dtct,dtut,dtvt,dtdivt)
+!$ACC PARALLEL LOOP PRIVATE(dsx,dsy,cc,dv1,dv2,div,dtct,dtut,dtvt,dtdivt)
   DO k=y_min,y_max
     DO j=x_min,x_max
 
@@ -130,17 +132,17 @@ SUBROUTINE calc_dt_kernel(x_min,x_max,y_min,y_max,             &
 
     ENDDO
   ENDDO
-!$OMP END DO
+!$ACC END PARALLEL LOOP
 
-!$OMP DO REDUCTION(MIN : dt_min_val)
+!$ACC PARALLEL LOOP REDUCTION(MIN : dt_min_val)
   DO k=y_min,y_max
     DO j=x_min,x_max
       IF(dt_min(j,k).LT.dt_min_val) dt_min_val=dt_min(j,k)
     ENDDO
   ENDDO
-!$OMP END DO
+!$ACC END PARALLEL LOOP
+!$ACC END DATA
 
-!$OMP END PARALLEL
 
   ! Extract the mimimum timestep information
   dtl_control=10.01*(jk_control-INT(jk_control))

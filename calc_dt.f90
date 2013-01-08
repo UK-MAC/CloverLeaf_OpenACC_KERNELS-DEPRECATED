@@ -25,6 +25,7 @@ CONTAINS
 
 SUBROUTINE calc_dt(chunk,local_dt,local_control,xl_pos,yl_pos,jldt,kldt)
 
+!DIR$ INLINENEVER calc_dt
   USE clover_module
   USE calc_dt_kernel_module
 

@@ -81,35 +81,35 @@ SUBROUTINE generate_chunk_kernel(x_min,x_max,y_min,y_max, &
 
   ! State 1 is always the background state
 
-!$OMP PARALLEL
-!$OMP DO
+!$ACC DATA
+!$ACC PARALLEL LOOP
   DO k=y_min-2,y_max+2
     DO j=x_min-2,x_max+2
       energy0(j,k)=state_energy(1)
     ENDDO
   ENDDO
-!$OMP END DO
-!$OMP DO
+!$ACC END PARALLEL LOOP
+!$ACC PARALLEL LOOP
   DO k=y_min-2,y_max+2
     DO j=x_min-2,x_max+2
       density0(j,k)=state_density(1)
     ENDDO
   ENDDO
-!$OMP END DO
-!$OMP DO
+!$ACC END PARALLEL LOOP
+!$ACC PARALLEL LOOP
   DO k=y_min-2,y_max+2
     DO j=x_min-2,x_max+2
       xvel0(j,k)=state_xvel(1)
     ENDDO
   ENDDO
-!$OMP END DO
-!$OMP DO
+!$ACC END PARALLEL LOOP
+!$ACC PARALLEL LOOP
   DO k=y_min-2,y_max+2
     DO j=x_min-2,x_max+2
       yvel0(j,k)=state_yvel(1)
     ENDDO
   ENDDO
-!$OMP END DO
+!$ACC END PARALLEL LOOP
 
   DO state=2,number_of_states
 
@@ -117,7 +117,7 @@ SUBROUTINE generate_chunk_kernel(x_min,x_max,y_min,y_max, &
     x_cent=state_xmin(state)
     y_cent=state_ymin(state)
 
-!$OMP DO PRIVATE(radius)
+!$ACC PARALLEL LOOP PRIVATE(radius)
     DO k=y_min-2,y_max+2
       DO j=x_min-2,x_max+2
         IF(state_geometry(state).EQ.g_rect ) THEN
@@ -148,11 +148,11 @@ SUBROUTINE generate_chunk_kernel(x_min,x_max,y_min,y_max, &
         ENDIF
       ENDDO
     ENDDO
-!$OMP END DO
+!$ACC END PARALLEL LOOP
 
   ENDDO
 
-!$OMP END PARALLEL
+!$ACC END DATA
 
 END SUBROUTINE generate_chunk_kernel
 

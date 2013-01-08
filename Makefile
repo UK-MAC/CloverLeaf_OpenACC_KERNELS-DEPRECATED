@@ -36,7 +36,7 @@
 #  export COMPILER=CRAY        # to select the Cray flags
 #  export COMPILER=PGI         # to select the PGI flags
 #  export COMPILER=PATHSCALE   # to select the Pathscale flags
-#  export COMPILER=XL          # to select the IBM Xlf flags
+#  export COMPILER=XLF         # to select the IBM Xlf flags
 
 # or this works as well:-
 #
@@ -68,24 +68,24 @@ OMP_GNU       = -fopenmp
 OMP_CRAY      =
 OMP_PGI       = -mp=nonuma
 OMP_PATHSCALE = -mp
-OMP_XL        = -qsmp=omp -qthreaded
+OMP_XLF       = -qsmp=omp -qthreaded
 OMP=$(OMP_$(COMPILER))
 
-FLAGS_INTEL     = -O3 -ipo -no-prec-div
+FLAGS_INTEL     = -O3 -ipo -no-prec-div -xhost
 FLAGS_SUN       = -fast -xipo=2 -Xlistv4
 FLAGS_GNU       = -O3 -march=native -funroll-loops
 FLAGS_CRAY      = -em -ra -h acc_model=fast_addr:no_deep_copy:auto_async_all
 FLAGS_PGI       = -fastsse -gopt -Mipa=fast -Mlist
 FLAGS_PATHSCALE = -O3
-FLAGS_XL       = -O5 -qipa=partition=large -g -qfullpath -Q -qsigtrap -qextname=flush:ideal_gas_kernel_c:viscosity_kernel_c:pdv_kernel_c:revert_kernel_c:accelerate_kernel_c:flux_calc_kernel_c:advec_cell_kernel_c:advec_mom_kernel_c:reset_field_kernel_c:timer_c -qlistopt -qattr=full -qlist -qreport -qxref=full -qsource -qsuppress=1506-224:1500-036
+FLAGS_XL       = -O5 -g -qfullpath -Q -qsigtrap -qextname=flush:ideal_gas_kernel_c:viscosity_kernel_c:pdv_kernel_c:revert_kernel_c:accelerate_kernel_c:flux_calc_kernel_c:advec_cell_kernel_c:advec_mom_kernel_c:reset_field_kernel_c:timer_c -qlistopt -qattr=full -qlist -qreport -qxref=full -qsource
 FLAGS_          = -O3
-CFLAGS_INTEL     = -O3 -ipo -no-prec-div -restrict -fno-alias
+CFLAGS_INTEL     = -O3 -ipo -no-prec-div -xhost -restrict -fno-alias
 CFLAGS_SUN       = -fast -xipo=2
 CFLAGS_GNU       = -O3 -march=native -funroll-loops
 CFLAGS_CRAY      = -em -h list=a
 CFLAGS_PGI       = -fastsse -gopt -Mipa=fast -Mlist
 CFLAGS_PATHSCALE = -O3
-CFLAGS_XL       = -O5 -qipa=partition=large -g -qfullpath -Q -qlistopt -qattr=full -qlist -qreport -qxref=full -qsource -qsuppress=1506-224:1500-036 -qsrcmsg
+CFLAGS_XL       = -O5 -g -qfullpath -Q -qsigtrap -qextname=lush:ideal_gas_kernel_c:viscosity_kernel_c:pdv_kernel_c:revert_kernel_c:accelerate_kernel_c:flux_calc_kernel_c:advec_cell_kernel_c:advec_mom_kernel_c:reset_field_kernel_c -qlistopt -qattr=full -qlist -qreport -qxref=full -qsource
 CFLAGS_          = -O3
 
 ifdef DEBUG
@@ -95,7 +95,7 @@ ifdef DEBUG
   FLAGS_CRAY      = -O0 -g -em -eD
   FLAGS_PGI       = -O0 -g -C -Mchkstk -Ktrap=fp -Mchkfpstk -Mchkptr
   FLAGS_PATHSCALE = -O0 -g
-  FLAGS_XL       = -O0 -g -qfullpath -qcheck -qflttrap=ov:zero:invalid:en -qsource -qinitauto=FF -qmaxmem=-1 -qinit=f90ptr -qsigtrap -qextname=flush:ideal_gas_kernel_c:viscosity_kernel_c:pdv_kernel_c:revert_kernel_c:accelerate_kernel_c:flux_calc_kernel_c:advec_cell_kernel_c:advec_mom_kernel_c:reset_field_kernel_c:timer_c
+  FLAGS_XL       = -O0 -g -qfullpath -O0 -qcheck -qflttrap=ov:zero:invalid:en -qsource -qinitauto=FF -qmaxmem=-1 -qinit=f90ptr-qsigtrap -qextname=flush:ideal_gas_kernel_c:viscosity_kernel_c:pdv_kernel_c:revert_kernel_c:accelerate_kernel_c:flux_calc_kernel_c:advec_cell_kernel_c:advec_mom_kernel_c:reset_field_kernel_c:timer_c
   FLAGS_          = -O0 -g
   CFLAGS_INTEL    = -O0 -g -debug all -traceback
   CFLAGS_SUN      = -g -O0 -xopenmp=noopt -stackvar -u -fpover=yes -C -ftrap=common
@@ -103,7 +103,7 @@ ifdef DEBUG
   CFLAGS_CRAY     = -O0 -g -em -eD
   CFLAGS_PGI      = -O0 -g -C -Mchkstk -Ktrap=fp -Mchkfpstk
   CFLAGS_PATHSCALE= -O0 -g
-  CFLAGS_XL      = -O0 -g -qfullpath -qcheck -qflttrap=ov:zero:invalid:en -qsource -qinitauto=FF -qmaxmem=-1 -qsrcmsg
+  CFLAGS_XL      = -O0 -g -qfullpath -O0 -qcheck -qflttrap=ov:zero:invalid:en -qsource -qinitauto=FF -qmaxmem=-1 -qinit=f90ptr-qsigtrap -qextname=flush:ideal_gas_kernel_c:viscosity_kernel_c:pdv_kernel_c:revert_kernel_c:accelerate_kernel_c:flux_calc_kernel_c:advec_cell_kernel_c:advec_mom_kernel_c:reset_field_kernel_c
 endif
 
 ifdef IEEE
@@ -192,5 +192,6 @@ c_lover: *.c Makefile
 	advec_cell_kernel_c.c           \
 	timer_c.c
 
+
 clean:
-	rm -f *.o *.mod *genmod* *.lst *.cub *.ptx clover_leaf
+	rm -f *.o *.mod *genmod* clover_leaf

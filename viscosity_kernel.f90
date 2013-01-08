@@ -45,11 +45,12 @@ SUBROUTINE viscosity_kernel(x_min,x_max,y_min,y_max,    &
 
   INTEGER       :: j,k
   REAL(KIND=8)  :: ugrad,vgrad,grad2,pgradx,pgrady,pgradx2,pgrady2,grad     &
-                  ,ygrad,pgrad,xgrad,div,strain2,limiter
+                  ,ygrad,pgrad,xgrad,div,strain2,limiter,dirx,diry
 
-!$OMP PARALLEL
+!$ACC DATA &
+!$ACC PRESENT(celldx,celldy,density0,pressure,xvel0,yvel0,viscosity)
 
-!$OMP DO PRIVATE(ugrad,vgrad,div,strain2,pgradx,pgrady,pgradx2,pgrady2,limiter,pgrad,xgrad,ygrad,grad,grad2)
+!$ACC PARALLEL LOOP PRIVATE(ugrad,vgrad,div,strain2,pgradx,pgrady,pgradx2,pgrady2,limiter,pgrad,xgrad,ygrad,grad,grad2,dirx,diry)
   DO k=y_min,y_max
     DO j=x_min,x_max
       ugrad=(xvel0(j+1,k  )+xvel0(j+1,k+1))-(xvel0(j  ,k  )+xvel0(j  ,k+1))
@@ -70,8 +71,12 @@ SUBROUTINE viscosity_kernel(x_min,x_max,y_min,y_max,    &
       limiter = ((0.5*(ugrad)/celldx(j))*pgradx2+(0.5*(vgrad)/celldy(k))*pgrady2+strain2*pgradx*pgrady)  &
               /MAX(pgradx2+pgrady2,1.0e-16_8)
 
-      pgradx = SIGN(MAX(1.0e-16_8,ABS(pgradx)),pgradx)
-      pgrady = SIGN(MAX(1.0e-16_8,ABS(pgrady)),pgrady)
+      dirx=1.0_8
+      IF(pgradx.LT.0.0) dirx=-1.0_8
+      pgradx = dirx*MAX(1.0e-16_8,ABS(pgradx))
+      diry=1.0_8
+      IF(pgradx.LT.0.0) diry=-1.0_8
+      pgrady = diry*MAX(1.0e-16_8,ABS(pgrady))
       pgrad = SQRT(pgradx**2+pgrady**2)
       xgrad = ABS(celldx(j)*pgrad/pgradx)
       ygrad = ABS(celldy(k)*pgrad/pgrady)
@@ -86,9 +91,9 @@ SUBROUTINE viscosity_kernel(x_min,x_max,y_min,y_max,    &
 
     ENDDO
   ENDDO
-!$OMP END DO
+!$ACC END PARALLEL LOOP
 
-!$OMP END PARALLEL
+!$ACC END DATA
 
 END SUBROUTINE viscosity_kernel
 
