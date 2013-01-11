@@ -507,7 +507,7 @@ loc_y_max=chunks(chunk)%field%y_max
       size=(1+(chunks(chunk)%field%y_max+y_inc+depth)-(chunks(chunk)%field%y_min-depth))*depth
 !$ACC DATA &
 !$ACC PRESENT(left_snd_buffer,field)
-!$ACC PARALLEL LOOP ASYNC(1)
+!$ACC PARALLEL LOOP
       DO k=loc_y_min-depth,loc_y_max+y_inc+depth
         DO j=1,depth
           index=j+(k+depth-1)*depth
@@ -515,14 +515,14 @@ loc_y_max=chunks(chunk)%field%y_max
         ENDDO
       ENDDO
 !$ACC END PARALLEL LOOP
-!$ACC UPDATE HOST (left_snd_buffer(1:size)) ASYNC(1)
+!$ACC UPDATE HOST (left_snd_buffer)
 !$ACC END DATA
 endif
      IF(chunks(chunk)%chunk_neighbours(chunk_right).NE.external_face) THEN
       size=(1+(chunks(chunk)%field%y_max+y_inc+depth)-(chunks(chunk)%field%y_min-depth))*depth
 !$ACC DATA &
 !$ACC PRESENT(right_snd_buffer,field)
-!$ACC PARALLEL LOOP ASYNC(2)
+!$ACC PARALLEL LOOP
       DO k=loc_y_min-depth,loc_y_max+y_inc+depth
         DO j=1,depth
           index=j+(k+depth-1)*depth
@@ -530,12 +530,11 @@ endif
         ENDDO
       ENDDO
 !$ACC END PARALLEL LOOP
-!$ACC UPDATE HOST (right_snd_buffer(1:size)) ASYNC(2)
+!$ACC UPDATE HOST (right_snd_buffer)
 !$ACC END DATA
     endif
   IF(chunks(chunk)%chunk_neighbours(chunk_left).NE.external_face) THEN
      size=(1+(chunks(chunk)%field%y_max+y_inc+depth)-(chunks(chunk)%field%y_min-depth))*depth
-!$ACC WAIT(1)
       tag=4*(chunk)+1 ! 4 because we have 4 faces, 1 because it is leaving the left face
       receiver=chunks(chunks(chunk)%chunk_neighbours(chunk_left))%task
       CALL MPI_ISEND(left_snd_buffer,size,MPI_DOUBLE_PRECISION,receiver,tag &
@@ -549,7 +548,6 @@ endif
 
    IF(chunks(chunk)%chunk_neighbours(chunk_right).NE.external_face) THEN
       size=(1+(chunks(chunk)%field%y_max+y_inc+depth)-(chunks(chunk)%field%y_min-depth))*depth
-!$ACC WAIT(2)
       tag=4*chunk+2 ! 4 because we have 4 faces, 2 because it is leaving the right face
       receiver=chunks(chunks(chunk)%chunk_neighbours(chunk_right))%task
       CALL MPI_ISEND(right_snd_buffer,size,MPI_DOUBLE_PRECISION,receiver,tag &
@@ -571,8 +569,8 @@ endif
     IF(chunks(chunk)%chunk_neighbours(chunk_left).NE.external_face) THEN
 !$ACC DATA &
 !$ACC PRESENT(left_rcv_buffer,field)
-!$ACC UPDATE DEVICE (left_rcv_buffer(1:size)) ASYNC(3)
-!$ACC PARALLEL LOOP ASYNC(3)
+!$ACC UPDATE DEVICE (left_rcv_buffer)
+!$ACC PARALLEL LOOP
       DO k=loc_y_min-depth,loc_y_max+y_inc+depth
         DO j=1,depth
           index=j+(k+depth-1)*depth
@@ -585,8 +583,8 @@ endif
     IF(chunks(chunk)%chunk_neighbours(chunk_right).NE.external_face) THEN
 !$ACC DATA &
 !$ACC PRESENT(right_rcv_buffer,field)
-!$ACC UPDATE DEVICE (right_rcv_buffer(1:size)) ASYNC(4)
-!$ACC PARALLEL LOOP ASYNC(4)
+!$ACC UPDATE DEVICE (right_rcv_buffer)
+!$ACC PARALLEL LOOP
       DO k=loc_y_min-depth,loc_y_max+y_inc+depth
         DO j=1,depth
           index=j+(k+depth-1)*depth
@@ -615,7 +613,7 @@ endif
         ENDDO
       ENDDO
 !$ACC END PARALLEL LOOP
-!$ACC UPDATE HOST (bottom_snd_buffer(1:size))
+!$ACC UPDATE HOST (bottom_snd_buffer)
 !$ACC END DATA
       tag=4*(chunk)+3 ! 4 because we have 4 faces, 3 because it is leaving the bottom face
       receiver=chunks(chunks(chunk)%chunk_neighbours(chunk_bottom))%task
@@ -640,7 +638,7 @@ endif
         ENDDO
       ENDDO
 !$ACC END PARALLEL LOOP
-!$ACC UPDATE HOST (top_snd_buffer(1:size))
+!$ACC UPDATE HOST (top_snd_buffer)
 !$ACC END DATA
       tag=4*(chunk)+4 ! 4 because we have 4 faces, 4 because it is leaving the top face
       receiver=chunks(chunks(chunk)%chunk_neighbours(chunk_top))%task
@@ -662,7 +660,7 @@ endif
     IF(chunks(chunk)%chunk_neighbours(chunk_bottom).NE.external_face) THEN
 !$ACC DATA &
 !$ACC PRESENT(bottom_rcv_buffer,field)
-!$ACC UPDATE DEVICE (bottom_rcv_buffer(1:size))
+!$ACC UPDATE DEVICE (bottom_rcv_buffer)
 !$ACC PARALLEL LOOP
       DO k=1,depth
         DO j=loc_x_min-depth,loc_x_max+x_inc+depth
@@ -676,7 +674,7 @@ endif
     IF(chunks(chunk)%chunk_neighbours(chunk_top).NE.external_face) THEN
 !$ACC DATA &
 !$ACC PRESENT(top_rcv_buffer,field)
-!$ACC UPDATE DEVICE (top_rcv_buffer(1:size))
+!$ACC UPDATE DEVICE (top_rcv_buffer)
 !$ACC PARALLEL LOOP
       DO k=1,depth
         DO j=loc_x_min-depth,loc_x_max+x_inc+depth

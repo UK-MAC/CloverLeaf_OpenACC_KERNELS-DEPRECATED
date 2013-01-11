@@ -75,7 +75,7 @@ SUBROUTINE accelerate_kernel(x_min,x_max,y_min,y_max,dt,     &
   ENDDO
 !$ACC END PARALLEL LOOP
 
-!$ACC PARALLEL LOOP ASYNC(1)
+!$ACC PARALLEL LOOP
   DO k=y_min,y_max+1
     DO j=x_min,x_max+1
 
@@ -85,7 +85,7 @@ SUBROUTINE accelerate_kernel(x_min,x_max,y_min,y_max,dt,     &
   ENDDO
 !$ACC END PARALLEL LOOP
 
-!$ACC PARALLEL LOOP ASYNC(2)
+!$ACC PARALLEL LOOP
   DO k=y_min,y_max+1
     DO j=x_min,x_max+1
 
@@ -96,7 +96,7 @@ SUBROUTINE accelerate_kernel(x_min,x_max,y_min,y_max,dt,     &
   ENDDO
 !$ACC END PARALLEL LOOP
 
-!$ACC PARALLEL LOOP ASYNC(1)
+!$ACC PARALLEL LOOP
   DO k=y_min,y_max+1
     DO j=x_min,x_max+1
 
@@ -107,7 +107,7 @@ SUBROUTINE accelerate_kernel(x_min,x_max,y_min,y_max,dt,     &
   ENDDO
 !$ACC END PARALLEL LOOP
 
-!$ACC PARALLEL LOOP ASYNC(2)
+!$ACC PARALLEL LOOP
   DO k=y_min,y_max+1
     DO j=x_min,x_max+1
 
@@ -117,7 +117,6 @@ SUBROUTINE accelerate_kernel(x_min,x_max,y_min,y_max,dt,     &
     ENDDO
   ENDDO
 !$ACC END PARALLEL LOOP
-!!$ACC WAIT
 
 !$ACC END DATA
 

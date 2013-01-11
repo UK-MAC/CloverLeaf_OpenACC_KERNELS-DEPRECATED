@@ -77,11 +77,14 @@ SUBROUTINE advec_cell_kernel(x_min,       &
 
   REAL(KIND=8) :: sigma,sigmat,sigmav,sigmam,sigma3,sigma4
   REAL(KIND=8) :: diffuw,diffdw,limiter,wind
-  REAL(KIND=8), PARAMETER :: one_by_six=1.0/6.0
+  !REAL(KIND=8), PARAMETER :: one_by_six=1.0/6.0
+  REAL(KIND=8):: one_by_six
 !$ACC DATA &
 !$ACC PRESENT(density1,energy1) &
 !$ACC PRESENT(vol_flux_x,vol_flux_y,volume,mass_flux_x,mass_flux_y,vertexdx,vertexdy) &
 !$ACC PRESENT(pre_vol,post_vol,post_ener,pre_mass,post_mass,advec_vol,ener_flux)
+
+  one_by_six=1.0/6.0
 
 
   IF(dir.EQ.g_xdir) THEN
@@ -145,10 +148,10 @@ SUBROUTINE advec_cell_kernel(x_min,       &
         sigmam=ABS(mass_flux_x(j,k))/(density1(donor,k)*pre_vol(donor,k))
         diffuw=energy1(donor,k)-energy1(upwind,k)
         diffdw=energy1(downwind,k)-energy1(donor,k)
+        wind=1.0_8
+        IF(diffdw.LE.0.0) wind=-1.0_8
         IF(diffuw*diffdw.GT.0.0)THEN
-          !limiter=(1.0-sigmam)*SIGN(1.0_8,diffdw)*MIN(ABS(diffuw),ABS(diffdw)&
-          !    ,one_by_six*(sigma3*ABS(diffuw)+sigma4*ABS(diffdw)))
-          limiter=(1.0-sigmam)*(diffdw)*MIN(ABS(diffuw),ABS(diffdw)&
+          limiter=(1.0-sigmam)*wind*MIN(ABS(diffuw),ABS(diffdw)&
               ,one_by_six*(sigma3*ABS(diffuw)+sigma4*ABS(diffdw)))
         ELSE
           limiter=0.0

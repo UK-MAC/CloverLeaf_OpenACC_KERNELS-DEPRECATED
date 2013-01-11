@@ -41,7 +41,7 @@ SUBROUTINE calc_dt_kernel(x_min,x_max,y_min,y_max,             &
                           density0,                            &
                           energy0,                             &
                           pressure,                            &
-                          viscosity,                           &
+                          viscosity_a,                           &
                           soundspeed,                          &
                           xvel0,yvel0,                         &
                           dt_min,                              &
@@ -54,7 +54,6 @@ SUBROUTINE calc_dt_kernel(x_min,x_max,y_min,y_max,             &
                           small)
 
   IMPLICIT NONE
-!DIR$ INLINENEVER calc_dt_kernel
 
   INTEGER :: x_min,x_max,y_min,y_max
   REAL(KIND=8)  :: g_small,g_big,dtmin,dt_min_val
@@ -69,7 +68,7 @@ SUBROUTINE calc_dt_kernel(x_min,x_max,y_min,y_max,             &
   REAL(KIND=8), DIMENSION(x_min-2:x_max+2,y_min-2:y_max+2) :: density0
   REAL(KIND=8), DIMENSION(x_min-2:x_max+2,y_min-2:y_max+2) :: energy0
   REAL(KIND=8), DIMENSION(x_min-2:x_max+2,y_min-2:y_max+2) :: pressure
-  REAL(KIND=8), DIMENSION(x_min-2:x_max+2,y_min-2:y_max+2) :: viscosity
+  REAL(KIND=8), DIMENSION(x_min-2:x_max+2,y_min-2:y_max+2) :: viscosity_a
   REAL(KIND=8), DIMENSION(x_min-2:x_max+2,y_min-2:y_max+2) :: soundspeed
   REAL(KIND=8), DIMENSION(x_min-2:x_max+3,y_min-2:y_max+3) :: xvel0,yvel0
   REAL(KIND=8), DIMENSION(x_min-2:x_max+3,y_min-2:y_max+3) :: dt_min
@@ -86,7 +85,8 @@ SUBROUTINE calc_dt_kernel(x_min,x_max,y_min,y_max,             &
 
   small=0
 !$ACC DATA    &
-!$ACC PRESENT(celldx,celldy,cellx,celly,density0,soundspeed,viscosity,volume,xarea,xvel0,yarea,yvel0,dt_min)
+!$ACC PRESENT(celldx,celldy,cellx,celly,density0,soundspeed,viscosity_a,volume) &
+!$ACC PRESENT(xarea,xvel0,yarea,yvel0,dt_min)
 
   dt_min_val = g_big
   jk_control=1.1
@@ -99,10 +99,12 @@ SUBROUTINE calc_dt_kernel(x_min,x_max,y_min,y_max,             &
        dsy=celldy(k)
 
        cc=soundspeed(j,k)**2
-       cc=cc+2.0*viscosity(j,k)/density0(j,k)
-       cc=MAX(SQRT(cc),g_small)
+       cc=cc+2.0*viscosity_a(j,k)/density0(j,k)
+       !cc=MAX(cc,g_small) ! Still causes a seg fault
+       cc=MAX(cc,1.0e-16)
+       cc=SQRT(cc)
 
-       dtct=dtc_safe*MIN(dsx,dsy)/cc
+       dtct=dtc_safe*MIN(dsx,dsy)/cc 
 
        div=0.0
 
@@ -118,7 +120,7 @@ SUBROUTINE calc_dt_kernel(x_min,x_max,y_min,y_max,             &
 
        div=div+dv2-dv1
 
-       dtvt=dtv_safe*2.0*volume(j,k)/MAX(ABS(dv1),ABS(dv2),g_small*volume(j,k))
+       dtvt=dtv_safe*2.0*volume(j,k)/MAX(ABS(dv1),ABS(dv2),g_small*volume(j,k)) 
 
        div=div/(2.0*volume(j,k))
 
@@ -129,10 +131,12 @@ SUBROUTINE calc_dt_kernel(x_min,x_max,y_min,y_max,             &
        ENDIF
 
        dt_min(j,k)=MIN(dtct,dtut,dtvt,dtdivt)
+       !dt_min(j,k)=0.0001
 
     ENDDO
   ENDDO
 !$ACC END PARALLEL LOOP
+
 
 !$ACC PARALLEL LOOP REDUCTION(MIN : dt_min_val)
   DO k=y_min,y_max

@@ -25,7 +25,6 @@ CONTAINS
 
 SUBROUTINE calc_dt(chunk,local_dt,local_control,xl_pos,yl_pos,jldt,kldt)
 
-!DIR$ INLINENEVER calc_dt
   USE clover_module
   USE calc_dt_kernel_module
 
@@ -45,7 +44,6 @@ SUBROUTINE calc_dt(chunk,local_dt,local_control,xl_pos,yl_pos,jldt,kldt)
   IF(chunks(chunk)%task.NE.parallel%task) RETURN
 
   small = 0
-
   CALL calc_dt_kernel(chunks(chunk)%field%x_min,     &
                       chunks(chunk)%field%x_max,     &
                       chunks(chunk)%field%y_min,     &
