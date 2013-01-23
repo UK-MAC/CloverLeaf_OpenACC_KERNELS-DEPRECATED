@@ -98,55 +98,67 @@ SUBROUTINE advec_mom_kernel(x_min,x_max,y_min,y_max,   &
 !$ACC PRESENT(mom_flux,advec_vel,node_flux,node_mass_post,node_mass_pre,post_vol,pre_vol)
 
   IF(mom_sweep.EQ.1)THEN ! x 1
-!$ACC PARALLEL LOOP
+!$ACC KERNELS
+!$ACC LOOP INDEPENDENT GANG(y_max-y_min+5) WORKER(1)
     DO k=y_min-2,y_max+2
+!$ACC LOOP INDEPENDENT VECTOR(128)
       DO j=x_min-2,x_max+2
         post_vol(j,k)= volume(j,k)+vol_flux_y(j  ,k+1)-vol_flux_y(j,k)
         pre_vol(j,k)=post_vol(j,k)+vol_flux_x(j+1,k  )-vol_flux_x(j,k)
       ENDDO
     ENDDO
-!$ACC END PARALLEL LOOP
+!$ACC END KERNELS
   ELSEIF(mom_sweep.EQ.2)THEN ! y 1
-!$ACC PARALLEL LOOP
+!$ACC KERNELS
+!$ACC LOOP INDEPENDENT GANG(y_max-y_min+5) WORKER(1)
     DO k=y_min-2,y_max+2
+!$ACC LOOP INDEPENDENT VECTOR(128)
       DO j=x_min-2,x_max+2
         post_vol(j,k)= volume(j,k)+vol_flux_x(j+1,k  )-vol_flux_x(j,k)
         pre_vol(j,k)=post_vol(j,k)+vol_flux_y(j  ,k+1)-vol_flux_y(j,k)
       ENDDO
     ENDDO
-!$ACC END PARALLEL LOOP
+!$ACC END KERNELS
   ELSEIF(mom_sweep.EQ.3)THEN ! x 2
-!$ACC PARALLEL LOOP
+!$ACC KERNELS
+!$ACC LOOP INDEPENDENT GANG(y_max-y_min+5) WORKER(1)
     DO k=y_min-2,y_max+2
+!$ACC LOOP INDEPENDENT VECTOR(128)
       DO j=x_min-2,x_max+2
         post_vol(j,k)=volume(j,k)
         pre_vol(j,k)=post_vol(j,k)+vol_flux_y(j  ,k+1)-vol_flux_y(j,k)
       ENDDO
     ENDDO
-!$ACC END PARALLEL LOOP
+!$ACC END KERNELS
   ELSEIF(mom_sweep.EQ.4)THEN ! y 2
-!$ACC PARALLEL LOOP
+!$ACC KERNELS
+!$ACC LOOP INDEPENDENT GANG(y_max-y_min+5) WORKER(1)
     DO k=y_min-2,y_max+2
+!$ACC LOOP INDEPENDENT VECTOR(128)
       DO j=x_min-2,x_max+2
         post_vol(j,k)=volume(j,k)
         pre_vol(j,k)=post_vol(j,k)+vol_flux_x(j+1,k  )-vol_flux_x(j,k)
        ENDDO
     ENDDO
-!$ACC END PARALLEL LOOP
+!$ACC END KERNELS
   ENDIF
 
   IF(direction.EQ.1)THEN
-!$ACC PARALLEL LOOP
+!$ACC KERNELS
+!$ACC LOOP INDEPENDENT GANG(y_max-y_min+2) WORKER(1)
     DO k=y_min,y_max+1
+!$ACC LOOP INDEPENDENT VECTOR(128)
       DO j=x_min-2,x_max+2
         ! Find staggered mesh mass fluxes, nodal masses and volumes.
         node_flux(j,k)=0.25_8*(mass_flux_x(j,k-1  )+mass_flux_x(j  ,k)  &
                         +mass_flux_x(j+1,k-1)+mass_flux_x(j+1,k)) ! Mass Flux
       ENDDO
     ENDDO
-!$ACC END PARALLEL LOOP
-!$ACC PARALLEL LOOP
+!$ACC END KERNELS
+!$ACC KERNELS
+!$ACC LOOP INDEPENDENT GANG(y_max-y_min+2) WORKER(1)
     DO k=y_min,y_max+1
+!$ACC LOOP INDEPENDENT VECTOR(128)
       DO j=x_min-1,x_max+2
         ! Staggered cell mass post advection
         node_mass_post(j,k)=0.25_8*(density1(j  ,k-1)*post_vol(j  ,k-1)                   &
@@ -155,21 +167,24 @@ SUBROUTINE advec_mom_kernel(x_min,x_max,y_min,y_max,   &
                                    +density1(j-1,k  )*post_vol(j-1,k  ))
       ENDDO
     ENDDO
-!$ACC END PARALLEL LOOP
-!$ACC PARALLEL LOOP
+!$ACC END KERNELS
+!$ACC KERNELS
+!$ACC LOOP INDEPENDENT GANG(y_max-y_min+2) WORKER(1)
     DO k=y_min,y_max+1
+!$ACC LOOP INDEPENDENT VECTOR(128)
       DO j=x_min-1,x_max+2
         ! Stagered cell mass pre advection
         node_mass_pre(j,k)=node_mass_post(j,k)-node_flux(j-1,k)+node_flux(j,k)
       ENDDO
     ENDDO
-!$ACC END PARALLEL LOOP
+!$ACC END KERNELS
 
     IF(vector) THEN
-!$ACC PARALLEL LOOP PRIVATE(sigma,width,limiter,vdiffuw,vdiffdw,auw,adw,wind &
+!$ACC KERNELS PRIVATE(sigma,width,limiter,vdiffuw,vdiffdw,auw,adw,wind &
 !$ACC                      ,sigma2,limiter2,vdiffuw2,vdiffdw2,auw2,wind2)
+!$ACC LOOP INDEPENDENT GANG(y_max-y_min+2) WORKER(1)
       DO k=y_min,y_max+1
-!$ACC LOOP VECTOR
+!$ACC LOOP INDEPENDENT VECTOR(128)
         DO j=x_min-1,x_max+1
           sigma=ABS(node_flux(j,k))/(node_mass_pre(j+1,k))
           sigma2=ABS(node_flux(j,k))/(node_mass_pre(j,k))
@@ -197,11 +212,12 @@ SUBROUTINE advec_mom_kernel(x_min,x_max,y_min,y_max,   &
           mom_flux(j,k)=advec_vel(j,k)*node_flux(j,k)
         ENDDO
       ENDDO
-!$ACC END PARALLEL LOOP
+!$ACC END KERNELS
     ELSE
-!$ACC PARALLEL LOOP PRIVATE(upwind,downwind,donor,dif,sigma,width,limiter,vdiffuw,vdiffdw,auw,adw,wind)
+!$ACC KERNELS PRIVATE(upwind,downwind,donor,dif,sigma,width,limiter,vdiffuw,vdiffdw,auw,adw,wind)
+!$ACC LOOP INDEPENDENT GANG(y_max-y_min+2) WORKER(1)
       DO k=y_min,y_max+1
-!$ACC LOOP VECTOR
+!$ACC LOOP INDEPENDENT VECTOR(128)
         DO j=x_min-1,x_max+1
           IF(node_flux(j,k).LT.0.0)THEN
             upwind=j+2
@@ -230,27 +246,33 @@ SUBROUTINE advec_mom_kernel(x_min,x_max,y_min,y_max,   &
           mom_flux(j,k)=advec_vel(j,k)*node_flux(j,k)
         ENDDO
       ENDDO
-!$ACC END PARALLEL LOOP
+!$ACC END KERNELS
     ENDIF
-!$ACC PARALLEL LOOP
+!$ACC KERNELS
+!$ACC LOOP INDEPENDENT GANG(y_max-y_min+2) WORKER(1)
     DO k=y_min,y_max+1
+!$ACC LOOP INDEPENDENT VECTOR(128)
       DO j=x_min,x_max+1
         vel1 (j,k)=(vel1 (j,k)*node_mass_pre(j,k)+mom_flux(j-1,k)-mom_flux(j,k))/node_mass_post(j,k)
       ENDDO
     ENDDO
-!$ACC END PARALLEL LOOP
+!$ACC END KERNELS
   ELSEIF(direction.EQ.2)THEN
-!$ACC PARALLEL LOOP
+!$ACC KERNELS
+!$ACC LOOP INDEPENDENT GANG(y_max-y_min+5) WORKER(1)
     DO k=y_min-2,y_max+2
+!$ACC LOOP INDEPENDENT VECTOR(128)
       DO j=x_min,x_max+1
         ! Find staggered mesh mass fluxes and nodal masses and volumes.
         node_flux(j,k)=0.25_8*(mass_flux_y(j-1,k  )+mass_flux_y(j  ,k  ) &
                               +mass_flux_y(j-1,k+1)+mass_flux_y(j  ,k+1))
       ENDDO
     ENDDO
-!$ACC END PARALLEL LOOP
-!$ACC PARALLEL LOOP
+!$ACC END KERNELS
+!$ACC KERNELS
+!$ACC LOOP INDEPENDENT GANG(y_max-y_min+4) WORKER(1)
     DO k=y_min-1,y_max+2
+!$ACC LOOP INDEPENDENT VECTOR(128)
       DO j=x_min,x_max+1
         node_mass_post(j,k)=0.25_8*(density1(j  ,k-1)*post_vol(j  ,k-1)                     &
                                    +density1(j  ,k  )*post_vol(j  ,k  )                     &
@@ -258,18 +280,22 @@ SUBROUTINE advec_mom_kernel(x_min,x_max,y_min,y_max,   &
                                    +density1(j-1,k  )*post_vol(j-1,k  ))
       ENDDO
     ENDDO
-!$ACC END PARALLEL LOOP
-!$ACC PARALLEL LOOP
+!$ACC END KERNELS
+!$ACC KERNELS
+!$ACC LOOP INDEPENDENT GANG(y_max-y_min+4) WORKER(1)
     DO k=y_min-1,y_max+2
+!$ACC LOOP INDEPENDENT VECTOR(128)
       DO j=x_min,x_max+1
         node_mass_pre(j,k)=node_mass_post(j,k)-node_flux(j,k-1)+node_flux(j,k)
       ENDDO
     ENDDO
-!$ACC END PARALLEL LOOP
+!$ACC END KERNELS
     IF(vector) THEN
-!$ACC PARALLEL LOOP PRIVATE(sigma,width,limiter,vdiffuw,vdiffdw,auw,adw,wind &
+!$ACC KERNELS PRIVATE(sigma,width,limiter,vdiffuw,vdiffdw,auw,adw,wind &
 !$ACC                      ,sigma2,limiter2,vdiffuw2,vdiffdw2,auw2,wind2)
+!$ACC LOOP INDEPENDENT GANG(y_max-y_min+3) WORKER(1)
       DO k=y_min-1,y_max+1
+!$ACC LOOP INDEPENDENT VECTOR(128)
         DO j=x_min,x_max+1
           sigma=ABS(node_flux(j,k))/(node_mass_pre(j,k+1))
           sigma2=ABS(node_flux(j,k))/(node_mass_pre(j,k))
@@ -297,10 +323,12 @@ SUBROUTINE advec_mom_kernel(x_min,x_max,y_min,y_max,   &
           mom_flux(j,k)=advec_vel(j,k)*node_flux(j,k)
         ENDDO
       ENDDO
-!$ACC END PARALLEL LOOP
+!$ACC END KERNELS
     ELSE
-!$ACC PARALLEL LOOP PRIVATE(upwind,downwind,donor,dif,sigma,width,limiter,vdiffuw,vdiffdw,auw,adw,wind)
+!$ACC KERNELS PRIVATE(upwind,downwind,donor,dif,sigma,width,limiter,vdiffuw,vdiffdw,auw,adw,wind)
+!$ACC LOOP INDEPENDENT GANG(y_max-y_min+3) WORKER(1)
       DO k=y_min-1,y_max+1
+!$ACC LOOP INDEPENDENT VECTOR(128)
         DO j=x_min,x_max+1
           IF(node_flux(j,k).LT.0.0)THEN
             upwind=k+2
@@ -330,15 +358,17 @@ SUBROUTINE advec_mom_kernel(x_min,x_max,y_min,y_max,   &
           mom_flux(j,k)=advec_vel(j,k)*node_flux(j,k)
         ENDDO
       ENDDO
-!$ACC END PARALLEL LOOP
+!$ACC END KERNELS
     ENDIF
-!$ACC PARALLEL LOOP
+!$ACC KERNELS
+!$ACC LOOP INDEPENDENT GANG(y_max-y_min+2) WORKER(1)
     DO k=y_min,y_max+1
+!$ACC LOOP INDEPENDENT VECTOR(128)
       DO j=x_min,x_max+1
         vel1 (j,k)=(vel1(j,k)*node_mass_pre(j,k)+mom_flux(j,k-1)-mom_flux(j,k))/node_mass_post(j,k)
       ENDDO
     ENDDO
-!$ACC END PARALLEL LOOP
+!$ACC END KERNELS
   ENDIF
 
 !$ACC END DATA

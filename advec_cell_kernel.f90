@@ -90,28 +90,34 @@ SUBROUTINE advec_cell_kernel(x_min,       &
   IF(dir.EQ.g_xdir) THEN
 
     IF(sweep_number.EQ.1)THEN
-!$ACC PARALLEL LOOP
+!$ACC KERNELS
+!$ACC LOOP INDEPENDENT GANG(y_max-y_min+5) WORKER(1)
       DO k=y_min-2,y_max+2
+!$ACC LOOP INDEPENDENT VECTOR(128)
         DO j=x_min-2,x_max+2
           pre_vol(j,k)=volume(j,k)+(vol_flux_x(j+1,k  )-vol_flux_x(j,k)+vol_flux_y(j  ,k+1)-vol_flux_y(j,k))
           post_vol(j,k)=pre_vol(j,k)-(vol_flux_x(j+1,k  )-vol_flux_x(j,k))
         ENDDO
       ENDDO 
-!$ACC END PARALLEL LOOP
+!$ACC END KERNELS
     ELSE
-!$ACC PARALLEL LOOP
+!$ACC KERNELS
+!$ACC LOOP INDEPENDENT GANG(y_max-y_min+5) WORKER(1)
       DO k=y_min-2,y_max+2
+!$ACC LOOP INDEPENDENT VECTOR(128)
         DO j=x_min-2,x_max+2
           pre_vol(j,k)=volume(j,k)+vol_flux_x(j+1,k)-vol_flux_x(j,k)
           post_vol(j,k)=volume(j,k)
         ENDDO
       ENDDO 
-!$ACC END PARALLEL LOOP
+!$ACC END KERNELS
     ENDIF
 
-!$ACC PARALLEL LOOP PRIVATE(upwind,donor,downwind,dif,sigmat,sigma3,sigma4,sigmav,sigma,sigmam, &
+!$ACC KERNELS PRIVATE(upwind,donor,downwind,dif,sigmat,sigma3,sigma4,sigmav,sigma,sigmam, &
 !$ACC                       diffuw,diffdw,limiter,wind)
+!$ACC LOOP INDEPENDENT GANG(y_max-y_min+1) WORKER(1)
     DO k=y_min,y_max
+!$ACC LOOP INDEPENDENT VECTOR(128)
       DO j=x_min,x_max+2
 
         IF(vol_flux_x(j,k).GT.0.0)THEN
@@ -161,10 +167,12 @@ SUBROUTINE advec_cell_kernel(x_min,       &
 
       ENDDO
     ENDDO
-!$ACC END PARALLEL LOOP
+!$ACC END KERNELS
 
-!$ACC PARALLEL LOOP
+!$ACC KERNELS
+!$ACC LOOP INDEPENDENT GANG(y_max-y_min+1) WORKER(1)
     DO k=y_min,y_max
+!$ACC LOOP INDEPENDENT VECTOR(128)
       DO j=x_min,x_max
         pre_mass(j,k)=density1(j,k)*pre_vol(j,k)
         post_mass(j,k)=pre_mass(j,k)+mass_flux_x(j,k)-mass_flux_x(j+1,k)
@@ -174,33 +182,39 @@ SUBROUTINE advec_cell_kernel(x_min,       &
         energy1(j,k)=post_ener(j,k)
       ENDDO
     ENDDO
-!$ACC END PARALLEL LOOP
+!$ACC END KERNELS
 
   ELSEIF(dir.EQ.g_ydir) THEN
 
     IF(sweep_number.EQ.1)THEN
-!$ACC PARALLEL LOOP
+!$ACC KERNELS
+!$ACC LOOP INDEPENDENT GANG(y_max-y_min+5) WORKER(1)
       DO k=y_min-2,y_max+2
+!$ACC LOOP INDEPENDENT VECTOR(128)
         DO j=x_min-2,x_max+2
           pre_vol(j,k)=volume(j,k)+(vol_flux_y(j  ,k+1)-vol_flux_y(j,k)+vol_flux_x(j+1,k  )-vol_flux_x(j,k))
           post_vol(j,k)=pre_vol(j,k)-(vol_flux_y(j  ,k+1)-vol_flux_y(j,k))
         ENDDO
       ENDDO
-!$ACC END PARALLEL LOOP
+!$ACC END KERNELS
     ELSE
-!$ACC PARALLEL LOOP
+!$ACC KERNELS
+!$ACC LOOP INDEPENDENT GANG(y_max-y_min+5) WORKER(1)
       DO k=y_min-2,y_max+2
+!$ACC LOOP INDEPENDENT VECTOR(128)
         DO j=x_min-2,x_max+2
           pre_vol(j,k)=volume(j,k)+vol_flux_y(j  ,k+1)-vol_flux_y(j,k)
           post_vol(j,k)=volume(j,k)
         ENDDO
       ENDDO
-!$ACC END PARALLEL LOOP
+!$ACC END KERNELS
     ENDIF
 
-!$ACC PARALLEL LOOP PRIVATE(upwind,donor,downwind,dif,sigmat,sigma3,sigma4,sigmav,sigma,sigmam, &
+!$ACC KERNELS PRIVATE(upwind,donor,downwind,dif,sigmat,sigma3,sigma4,sigmav,sigma,sigmam, &
 !$ACC                       diffuw,diffdw,limiter,wind)
+!$ACC LOOP INDEPENDENT GANG(y_max-y_min+3) WORKER(1)
     DO k=y_min,y_max+2
+!$ACC LOOP INDEPENDENT VECTOR(128)
       DO j=x_min,x_max
 
         IF(vol_flux_y(j,k).GT.0.0)THEN
@@ -249,10 +263,12 @@ SUBROUTINE advec_cell_kernel(x_min,       &
 
       ENDDO
     ENDDO
-!$ACC END PARALLEL LOOP
+!$ACC END KERNELS
 
-!$ACC PARALLEL LOOP
+!$ACC KERNELS
+!$ACC LOOP INDEPENDENT GANG(y_max-y_min+1) WORKER(1)
     DO k=y_min,y_max
+!$ACC LOOP INDEPENDENT VECTOR(128)
       DO j=x_min,x_max
         pre_mass(j,k)=density1(j,k)*pre_vol(j,k)
         post_mass(j,k)=pre_mass(j,k)+mass_flux_y(j,k)-mass_flux_y(j,k+1)
@@ -262,7 +278,7 @@ SUBROUTINE advec_cell_kernel(x_min,       &
         energy1(j,k)=post_ener(j,k)
       ENDDO
     ENDDO
-!$ACC END PARALLEL LOOP
+!$ACC END KERNELS
 
   ENDIF
 

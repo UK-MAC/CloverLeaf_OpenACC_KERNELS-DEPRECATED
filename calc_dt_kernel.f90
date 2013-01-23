@@ -91,8 +91,10 @@ SUBROUTINE calc_dt_kernel(x_min,x_max,y_min,y_max,             &
   dt_min_val = g_big
   jk_control=1.1
 
-!$ACC PARALLEL LOOP PRIVATE(dsx,dsy,cc,dv1,dv2,div,dtct,dtut,dtvt,dtdivt)
+!$ACC KERNELS PRIVATE(dsx,dsy,cc,dv1,dv2,div,dtct,dtut,dtvt,dtdivt)
+!$ACC LOOP INDEPENDENT GANG(y_max-y_min+2) WORKER(1)
   DO k=y_min,y_max
+!$ACC LOOP INDEPENDENT VECTOR(128)
     DO j=x_min,x_max
 
        dsx=celldx(j)
@@ -135,16 +137,17 @@ SUBROUTINE calc_dt_kernel(x_min,x_max,y_min,y_max,             &
 
     ENDDO
   ENDDO
-!$ACC END PARALLEL LOOP
+!$ACC END KERNELS
 
 
-!$ACC PARALLEL LOOP REDUCTION(MIN : dt_min_val)
+!$ACC KERNELS
+!$hmppcg gridify(k,j), reduce(min:dt_min_val)
   DO k=y_min,y_max
     DO j=x_min,x_max
       IF(dt_min(j,k).LT.dt_min_val) dt_min_val=dt_min(j,k)
     ENDDO
   ENDDO
-!$ACC END PARALLEL LOOP
+!$ACC END KERNELS
 !$ACC END DATA
 
 
