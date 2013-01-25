@@ -180,11 +180,10 @@ SUBROUTINE advec_mom_kernel(x_min,x_max,y_min,y_max,   &
 !$ACC END KERNELS
 
     IF(vector) THEN
-!$ACC KERNELS PRIVATE(sigma,width,limiter,vdiffuw,vdiffdw,auw,adw,wind &
-!$ACC                      ,sigma2,limiter2,vdiffuw2,vdiffdw2,auw2,wind2)
+!$ACC KERNELS
 !$ACC LOOP INDEPENDENT GANG(y_max-y_min+2) WORKER(1)
       DO k=y_min,y_max+1
-!$ACC LOOP INDEPENDENT VECTOR(128)
+!$ACC LOOP INDEPENDENT VECTOR(128) PRIVATE(sigma,width,limiter,vdiffuw,vdiffdw,auw,adw,wind,sigma2,limiter2,vdiffuw2,vdiffdw2,auw2,wind2)
         DO j=x_min-1,x_max+1
           sigma=ABS(node_flux(j,k))/(node_mass_pre(j+1,k))
           sigma2=ABS(node_flux(j,k))/(node_mass_pre(j,k))
@@ -214,10 +213,10 @@ SUBROUTINE advec_mom_kernel(x_min,x_max,y_min,y_max,   &
       ENDDO
 !$ACC END KERNELS
     ELSE
-!$ACC KERNELS PRIVATE(upwind,downwind,donor,dif,sigma,width,limiter,vdiffuw,vdiffdw,auw,adw,wind)
+!$ACC KERNELS
 !$ACC LOOP INDEPENDENT GANG(y_max-y_min+2) WORKER(1)
       DO k=y_min,y_max+1
-!$ACC LOOP INDEPENDENT VECTOR(128)
+!$ACC LOOP INDEPENDENT VECTOR(128) PRIVATE(upwind,downwind,donor,dif,sigma,width,limiter,vdiffuw,vdiffdw,auw,adw,wind)
         DO j=x_min-1,x_max+1
           IF(node_flux(j,k).LT.0.0)THEN
             upwind=j+2
@@ -291,11 +290,10 @@ SUBROUTINE advec_mom_kernel(x_min,x_max,y_min,y_max,   &
     ENDDO
 !$ACC END KERNELS
     IF(vector) THEN
-!$ACC KERNELS PRIVATE(sigma,width,limiter,vdiffuw,vdiffdw,auw,adw,wind &
-!$ACC                      ,sigma2,limiter2,vdiffuw2,vdiffdw2,auw2,wind2)
+!$ACC KERNELS
 !$ACC LOOP INDEPENDENT GANG(y_max-y_min+3) WORKER(1)
       DO k=y_min-1,y_max+1
-!$ACC LOOP INDEPENDENT VECTOR(128)
+!$ACC LOOP INDEPENDENT VECTOR(128) PRIVATE(sigma,width,limiter,vdiffuw,vdiffdw,auw,adw,wind,sigma2,limiter2,vdiffuw2,vdiffdw2,auw2,wind2)
         DO j=x_min,x_max+1
           sigma=ABS(node_flux(j,k))/(node_mass_pre(j,k+1))
           sigma2=ABS(node_flux(j,k))/(node_mass_pre(j,k))
@@ -325,10 +323,10 @@ SUBROUTINE advec_mom_kernel(x_min,x_max,y_min,y_max,   &
       ENDDO
 !$ACC END KERNELS
     ELSE
-!$ACC KERNELS PRIVATE(upwind,downwind,donor,dif,sigma,width,limiter,vdiffuw,vdiffdw,auw,adw,wind)
+!$ACC KERNELS
 !$ACC LOOP INDEPENDENT GANG(y_max-y_min+3) WORKER(1)
       DO k=y_min-1,y_max+1
-!$ACC LOOP INDEPENDENT VECTOR(128)
+!$ACC LOOP INDEPENDENT VECTOR(128) PRIVATE(upwind,downwind,donor,dif,sigma,width,limiter,vdiffuw,vdiffdw,auw,adw,wind)
         DO j=x_min,x_max+1
           IF(node_flux(j,k).LT.0.0)THEN
             upwind=k+2

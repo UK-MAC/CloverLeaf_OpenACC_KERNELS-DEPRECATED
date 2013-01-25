@@ -50,10 +50,10 @@ SUBROUTINE viscosity_kernel(x_min,x_max,y_min,y_max,    &
 !$ACC DATA &
 !$ACC PRESENT(celldx,celldy,density0,pressure,xvel0,yvel0,viscosity)
 
-!$ACC KERNELS PRIVATE(ugrad,vgrad,div,strain2,pgradx,pgrady,pgradx2,pgrady2,limiter,pgrad,xgrad,ygrad,grad,grad2,dirx,diry)
+!$ACC KERNELS
 !$ACC LOOP INDEPENDENT GANG(y_max-y_min+1) WORKER(1)
   DO k=y_min,y_max
-!$ACC LOOP INDEPENDENT VECTOR(128)
+!$ACC LOOP INDEPENDENT VECTOR(128) PRIVATE(ugrad,vgrad,div,strain2,pgradx,pgrady,pgradx2,pgrady2,limiter,pgrad,xgrad,ygrad,grad,grad2,dirx,diry)
     DO j=x_min,x_max
       ugrad=(xvel0(j+1,k  )+xvel0(j+1,k+1))-(xvel0(j  ,k  )+xvel0(j  ,k+1))
 

@@ -54,8 +54,8 @@ SUBROUTINE field_summary_kernel(x_min,x_max,y_min,y_max, &
 !$ACC DATA &
 !$ACC PRESENT(volume,density0,energy0,pressure,xvel0,yvel0) 
 !!$ACC COPY(vol,mass,ie,ke,press)
-!$ACC KERNELS PRIVATE(vsqrd,cell_vol,cell_mass)
-!$hmppcg gridify(k,j), reduce(+:vol), reduce(+:mass), reduce(+:press), reduce(+:ie), reduce(+:ke)
+!$ACC KERNELS
+!$hmppcg gridify(k,j), reduce(+:vol), reduce(+:mass), reduce(+:press), reduce(+:ie), reduce(+:ke), private(vsqrd,cell_vol,cell_mass)
   DO k=y_min,y_max
     DO j=x_min,x_max
       vsqrd=0.0

@@ -113,11 +113,10 @@ SUBROUTINE advec_cell_kernel(x_min,       &
 !$ACC END KERNELS
     ENDIF
 
-!$ACC KERNELS PRIVATE(upwind,donor,downwind,dif,sigmat,sigma3,sigma4,sigmav,sigma,sigmam, &
-!$ACC                       diffuw,diffdw,limiter,wind)
+!$ACC KERNELS
 !$ACC LOOP INDEPENDENT GANG(y_max-y_min+1) WORKER(1)
     DO k=y_min,y_max
-!$ACC LOOP INDEPENDENT VECTOR(128)
+!$ACC LOOP INDEPENDENT VECTOR(128) PRIVATE(upwind,donor,downwind,dif,sigmat,sigma3,sigma4,sigmav,sigma,sigmam,diffuw,diffdw,limiter,wind)
       DO j=x_min,x_max+2
 
         IF(vol_flux_x(j,k).GT.0.0)THEN
@@ -210,11 +209,10 @@ SUBROUTINE advec_cell_kernel(x_min,       &
 !$ACC END KERNELS
     ENDIF
 
-!$ACC KERNELS PRIVATE(upwind,donor,downwind,dif,sigmat,sigma3,sigma4,sigmav,sigma,sigmam, &
-!$ACC                       diffuw,diffdw,limiter,wind)
+!$ACC KERNELS
 !$ACC LOOP INDEPENDENT GANG(y_max-y_min+3) WORKER(1)
     DO k=y_min,y_max+2
-!$ACC LOOP INDEPENDENT VECTOR(128)
+!$ACC LOOP INDEPENDENT VECTOR(128) PRIVATE(upwind,donor,downwind,dif,sigmat,sigma3,sigma4,sigmav,sigma,sigmam,diffuw,diffdw,limiter,wind)
       DO j=x_min,x_max
 
         IF(vol_flux_y(j,k).GT.0.0)THEN

@@ -72,11 +72,10 @@ SUBROUTINE PdV_kernel(predict,                                          &
 
   IF(predict)THEN
 
-!$ACC KERNELS PRIVATE(right_flux,left_flux,top_flux,bottom_flux,total_flux,min_cell_volume, &
-!$ACC                       energy_change,recip_volume)
+!$ACC KERNELS
 !$ACC LOOP INDEPENDENT GANG(y_max-y_min+1) WORKER(1)
     DO k=y_min,y_max
-!$ACC LOOP INDEPENDENT VECTOR(128)
+!$ACC LOOP INDEPENDENT VECTOR(128) PRIVATE(right_flux,left_flux,top_flux,bottom_flux,total_flux,min_cell_volume,energy_change,recip_volume)
       DO j=x_min,x_max
 
         left_flux=  (xarea(j  ,k  )*(xvel0(j  ,k  )+xvel0(j  ,k+1)                     &
@@ -109,11 +108,10 @@ SUBROUTINE PdV_kernel(predict,                                          &
 
   ELSE
 
-!$ACC KERNELS PRIVATE(right_flux,left_flux,top_flux,bottom_flux,total_flux,min_cell_volume, &
-!$ACC                       energy_change,recip_volume)
+!$ACC KERNELS
 !$ACC LOOP INDEPENDENT GANG(y_max-y_min+1) WORKER(1)
     DO k=y_min,y_max
-!$ACC LOOP INDEPENDENT VECTOR(128)
+!$ACC LOOP INDEPENDENT VECTOR(128) PRIVATE(right_flux,left_flux,top_flux,bottom_flux,total_flux,min_cell_volume,energy_change,recip_volume)
       DO j=x_min,x_max
 
         left_flux=  (xarea(j  ,k  )*(xvel0(j  ,k  )+xvel0(j  ,k+1)                     &

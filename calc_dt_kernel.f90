@@ -91,10 +91,10 @@ SUBROUTINE calc_dt_kernel(x_min,x_max,y_min,y_max,             &
   dt_min_val = g_big
   jk_control=1.1
 
-!$ACC KERNELS PRIVATE(dsx,dsy,cc,dv1,dv2,div,dtct,dtut,dtvt,dtdivt)
+!$ACC KERNELS
 !$ACC LOOP INDEPENDENT GANG(y_max-y_min+2) WORKER(1)
   DO k=y_min,y_max
-!$ACC LOOP INDEPENDENT VECTOR(128)
+!$ACC LOOP INDEPENDENT VECTOR(128) PRIVATE(dsx,dsy,cc,dv1,dv2,div,dtct,dtut,dtvt,dtdivt)
     DO j=x_min,x_max
 
        dsx=celldx(j)
