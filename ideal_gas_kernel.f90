@@ -45,9 +45,9 @@ SUBROUTINE ideal_gas_kernel(x_min,x_max,y_min,y_max,                &
 !$ACC DATA &
 !$ACC PRESENT(density,energy,pressure,soundspeed)
 !$ACC KERNELS
-!$ACC LOOP INDEPENDENT GANG(y_max-y_min+1) WORKER(1)
+!$ACC LOOP INDEPENDENT
   DO k=y_min,y_max
-!$ACC LOOP INDEPENDENT VECTOR(128) PRIVATE(v,pressurebyenergy,pressurebyvolume,sound_speed_squared)
+!$ACC LOOP INDEPENDENT PRIVATE(v,pressurebyenergy,pressurebyvolume,sound_speed_squared)
     DO j=x_min,x_max
       v=1.0_8/density(j,k)
       pressure(j,k)=(1.4_8-1.0_8)*density(j,k)*energy(j,k)

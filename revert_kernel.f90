@@ -41,21 +41,25 @@ SUBROUTINE revert_kernel(x_min,x_max,y_min,y_max,density0,density1,energy0,energ
 !$ACC DATA &
 !$ACC PRESENT(density0,density1,energy0,energy1)
 
-!$ACC PARALLEL LOOP
+!$ACC KERNELS
+!$ACC LOOP INDEPENDENT
   DO k=y_min,y_max
+!$ACC LOOP INDEPENDENT
     DO j=x_min,x_max
       density1(j,k)=density0(j,k)
     ENDDO
   ENDDO
-!$ACC END PARALLEL LOOP
+!$ACC END KERNELS
 
-!$ACC PARALLEL LOOP
+!$ACC KERNELS
+!$ACC LOOP INDEPENDENT
   DO k=y_min,y_max
+!$ACC LOOP INDEPENDENT
     DO j=x_min,x_max
       energy1(j,k)=energy0(j,k)
     ENDDO
   ENDDO
-!$ACC END PARALLEL LOOP
+!$ACC END KERNELS
 
 !$ACC END DATA
 

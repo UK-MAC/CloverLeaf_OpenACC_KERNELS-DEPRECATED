@@ -59,8 +59,11 @@ SUBROUTINE accelerate_kernel(x_min,x_max,y_min,y_max,dt,     &
 !$ACC PRESENT(xvel1,yvel1)   &
 !$ACC PRESENT(stepbymass)
 
-!$ACC PARALLEL LOOP PRIVATE(nodal_mass)
+!$ACC KERNELS
+
+!$ACC LOOP INDEPENDENT
   DO k=y_min,y_max+1
+!$ACC LOOP INDEPENDENT PRIVATE(nodal_mass)
     DO j=x_min,x_max+1
 
       nodal_mass=(density0(j-1,k-1)*volume(j-1,k-1)  &
@@ -73,20 +76,20 @@ SUBROUTINE accelerate_kernel(x_min,x_max,y_min,y_max,dt,     &
 
     ENDDO
   ENDDO
-!$ACC END PARALLEL LOOP
 
-!$ACC PARALLEL LOOP
+!$ACC LOOP INDEPENDENT
   DO k=y_min,y_max+1
+!$ACC LOOP INDEPENDENT
     DO j=x_min,x_max+1
 
       xvel1(j,k)=xvel0(j,k)-stepbymass(j,k)*(xarea(j  ,k  )*(pressure(j  ,k  )-pressure(j-1,k  ))    &
                                             +xarea(j  ,k-1)*(pressure(j  ,k-1)-pressure(j-1,k-1)))
     ENDDO
   ENDDO
-!$ACC END PARALLEL LOOP
 
-!$ACC PARALLEL LOOP
+!$ACC LOOP INDEPENDENT
   DO k=y_min,y_max+1
+!$ACC LOOP INDEPENDENT
     DO j=x_min,x_max+1
 
       yvel1(j,k)=yvel0(j,k)-stepbymass(j,k)*(yarea(j  ,k  )*(pressure(j  ,k  )-pressure(j  ,k-1))    &
@@ -94,10 +97,10 @@ SUBROUTINE accelerate_kernel(x_min,x_max,y_min,y_max,dt,     &
 
     ENDDO
   ENDDO
-!$ACC END PARALLEL LOOP
 
-!$ACC PARALLEL LOOP
+!$ACC LOOP INDEPENDENT
   DO k=y_min,y_max+1
+!$ACC LOOP INDEPENDENT
     DO j=x_min,x_max+1
 
       xvel1(j,k)=xvel1(j,k)-stepbymass(j,k)*(xarea(j  ,k  )*(viscosity(j  ,k  )-viscosity(j-1,k  )) &
@@ -105,10 +108,10 @@ SUBROUTINE accelerate_kernel(x_min,x_max,y_min,y_max,dt,     &
 
     ENDDO
   ENDDO
-!$ACC END PARALLEL LOOP
 
-!$ACC PARALLEL LOOP
+!$ACC LOOP INDEPENDENT
   DO k=y_min,y_max+1
+!$ACC LOOP INDEPENDENT
     DO j=x_min,x_max+1
 
       yvel1(j,k)=yvel1(j,k)-stepbymass(j,k)*(yarea(j  ,k  )*(viscosity(j  ,k  )-viscosity(j  ,k-1)) &
@@ -116,7 +119,8 @@ SUBROUTINE accelerate_kernel(x_min,x_max,y_min,y_max,dt,     &
 
     ENDDO
   ENDDO
-!$ACC END PARALLEL LOOP
+
+!$ACC END KERNELS
 
 !$ACC END DATA
 

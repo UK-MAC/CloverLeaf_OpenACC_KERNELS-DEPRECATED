@@ -125,8 +125,10 @@ SUBROUTINE hydro_cycle(c,                 &
   
   REAL(KIND=8)    :: grind_time
   REAL(KIND=8)    :: step_time,step_grind
+  REAL(KIND=8)    :: tt(0:9), t0, t1
 
   timerstart = timer()
+  tt(:) = 0.0
 
 !$ACC DATA &
 !$ACC COPYIN(density0)   &
@@ -174,22 +176,43 @@ SUBROUTINE hydro_cycle(c,                 &
   DO
 
     step_time = timer()
-
+    t0 = step_time
     step = step + 1
 
     CALL timestep(c)
 
+    t1 = timer()
+    tt(0) = tt(0) + (t1 - t0)
+
     CALL PdV(c,.TRUE.)
+
+    t0 = timer()
+    tt(1) = tt(1) + (t0 - t1)
 
     CALL accelerate(c)
 
+    t1 = timer()
+    tt(2) = tt(2) + (t1 - t0)
+
     CALL PdV(c,.FALSE.)
+
+    t0 = timer()
+    tt(3) = tt(3) + (t0 - t1)
 
     CALL flux_calc(c)
 
+    t1 = timer()
+    tt(4) = tt(4) + (t1 - t0)
+
     CALL advection(c)
 
+    t0 = timer()
+    tt(5) = tt(5) + (t0 - t1)
+
     CALL reset_field(c)
+
+    t1 = timer()
+    tt(6) = tt(6) + (t1 - t0)
 
     advect_x = .NOT. advect_x
   
@@ -198,9 +221,16 @@ SUBROUTINE hydro_cycle(c,                 &
     IF(summary_frequency.NE.0) THEN
       IF(MOD(step, summary_frequency).EQ.0) CALL field_summary(c)
     ENDIF
+
+    t0 = timer()
+    tt(7) = tt(7) + (t0 - t1)
+
     IF(visit_frequency.NE.0) THEN
       IF(MOD(step, visit_frequency).EQ.0) CALL visit(c)
     ENDIF
+
+    t1 = timer()
+    tt(8) = tt(8) + (t1 - t0)
 
     IF(time+g_small.GT.end_time.OR.step.GE.end_step) THEN
 
@@ -222,6 +252,9 @@ SUBROUTINE hydro_cycle(c,                 &
 
     END IF
 
+    t0 = timer()
+    tt(9) = tt(9) + (t0 - t1)
+
     IF (parallel%boss) THEN
       WRITE(g_out,*)"Wall clock ",timer()-timerstart
       WRITE(0    ,*)"Wall clock ",timer()-timerstart
@@ -238,6 +271,10 @@ SUBROUTINE hydro_cycle(c,                 &
   END DO
 
 !$ACC END DATA
+
+  WRITE(*,'(11A9)'), "TSTEP", "PDV1", "ACCEL", "PDV2", "FLUX", "ADVEC", "RESET", "FSUMA", "VISIT", "FINAL", "TOTAL"
+  WRITE(*,'(11F9.2)'), tt(0:9), sum(tt(0:9))
+  WRITE(*,'(11F9.2)'), 100.*tt(0:9)/sum(tt(0:9)), 100
 
 END SUBROUTINE hydro_cycle
 

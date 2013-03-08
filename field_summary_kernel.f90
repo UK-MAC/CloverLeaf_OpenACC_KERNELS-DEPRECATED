@@ -52,11 +52,12 @@ SUBROUTINE field_summary_kernel(x_min,x_max,y_min,y_max, &
   press=0.0
 
 !$ACC DATA &
-!$ACC PRESENT(volume,density0,energy0,pressure,xvel0,yvel0) 
-!!$ACC COPY(vol,mass,ie,ke,press)
+!$ACC PRESENT(volume,density0,energy0,pressure,xvel0,yvel0)
 !$ACC KERNELS
-!$hmppcg gridify(k,j), reduce(+:vol), reduce(+:mass), reduce(+:press), reduce(+:ie), reduce(+:ke), private(vsqrd,cell_vol,cell_mass)
+! $ h m p p c g gridify(k,j), reduce(+:vol), reduce(+:mass), reduce(+:press), reduce(+:ie), reduce(+:ke), private(vsqrd,cell_vol,cell_mass)
+!$ACC LOOP INDEPENDENT REDUCTION(+:vol) REDUCTION(+:mass) REDUCTION(+:press) REDUCTION(+:ie) REDUCTION(+:ke), private(vsqrd,cell_vol,cell_mass) GANG(128)
   DO k=y_min,y_max
+!$ACC LOOP INDEPENDENT REDUCTION(+:vol) REDUCTION(+:mass) REDUCTION(+:press) REDUCTION(+:ie) REDUCTION(+:ke), private(vsqrd,cell_vol,cell_mass) WORKER(64)
     DO j=x_min,x_max
       vsqrd=0.0
       DO kv=k,k+1

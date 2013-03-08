@@ -46,37 +46,45 @@ SUBROUTINE reset_field_kernel(x_min,x_max,y_min,y_max,    &
 
 !$ACC DATA &
 !$ACC PRESENT(density0,energy0,density1,energy1,xvel0,yvel0,xvel1,yvel1)
-!$ACC PARALLEL LOOP
+!$ACC KERNELS
+!$ACC LOOP INDEPENDENT
   DO k=y_min,y_max
+!$ACC LOOP INDEPENDENT
      DO j=x_min,x_max
         density0(j,k)=density1(j,k)
      ENDDO
   ENDDO
-!$ACC END PARALLEL LOOP
+!$ACC END KERNELS
 
-!$ACC PARALLEL LOOP
+!$ACC KERNELS
+!$ACC LOOP INDEPENDENT
   DO k=y_min,y_max
+!$ACC LOOP INDEPENDENT
      DO j=x_min,x_max
         energy0(j,k)=energy1(j,k)
      ENDDO
   ENDDO
-!$ACC END PARALLEL LOOP
+!$ACC END KERNELS
 
-!$ACC PARALLEL LOOP
+!$ACC KERNELS
+!$ACC LOOP INDEPENDENT
   DO k=y_min,y_max+1
+!$ACC LOOP INDEPENDENT
      DO j=x_min,x_max+1
         xvel0(j,k)=xvel1(j,k)
      ENDDO
   ENDDO
-!$ACC END PARALLEL LOOP
+!$ACC END KERNELS
 
-!$ACC PARALLEL LOOP
+!$ACC KERNELS
+!$ACC LOOP INDEPENDENT
   DO k=y_min,y_max+1
+!$ACC LOOP INDEPENDENT
      DO j=x_min,x_max+1
         yvel0(j,k)=yvel1(j,k)
      ENDDO
   ENDDO
-!$ACC END PARALLEL LOOP
+!$ACC END KERNELS
 !$ACC END DATA
 
 END SUBROUTINE reset_field_kernel

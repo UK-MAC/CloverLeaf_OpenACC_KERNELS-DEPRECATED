@@ -49,23 +49,27 @@ SUBROUTINE flux_calc_kernel(x_min,x_max,y_min,y_max,dt,              &
 !$ACC DATA &
 !$ACC PRESENT(xvel0,yvel0,xvel1,yvel1,xarea,yarea,vol_flux_x,vol_flux_y)
 
-!$ACC PARALLEL LOOP
+!$ACC KERNELS
+!$ACC LOOP INDEPENDENT
   DO k=y_min,y_max
+!$ACC LOOP INDEPENDENT
     DO j=x_min,x_max+1 
       vol_flux_x(j,k)=0.25*dt*xarea(j,k)                  &
                      *(xvel0(j,k)+xvel0(j,k+1)+xvel1(j,k)+xvel1(j,k+1))
     ENDDO
   ENDDO
-!$ACC END PARALLEL LOOP
+!$ACC END KERNELS
 
-!$ACC PARALLEL LOOP
+!$ACC KERNELS
+!$ACC LOOP INDEPENDENT
   DO k=y_min,y_max+1
+!$ACC LOOP INDEPENDENT
     DO j=x_min,x_max
       vol_flux_y(j,k)=0.25*dt*yarea(j,k)                  &
                      *(yvel0(j,k)+yvel0(j+1,k)+yvel1(j,k)+yvel1(j+1,k))
     ENDDO
   ENDDO
-!$ACC END PARALLEL LOOP
+!$ACC END KERNELS
 
 !$ACC END DATA
 

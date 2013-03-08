@@ -56,78 +56,91 @@ SUBROUTINE initialise_chunk_kernel(x_min,x_max,y_min,y_max,       &
   INTEGER      :: j,k
 
 !$ACC DATA
-!$ACC PARALLEL LOOP
+!$ACC KERNELS
+!$ACC LOOP INDEPENDENT
   DO j=x_min-2,x_max+3
      vertexx(j)=xmin+dx*float(j-x_min)
   ENDDO
-!$ACC END PARALLEL LOOP
+!$ACC END KERNELS
 
-!$ACC PARALLEL LOOP
+!$ACC KERNELS
+!$ACC LOOP INDEPENDENT
   DO j=x_min-2,x_max+3
     vertexdx(j)=dx
   ENDDO
-!$ACC END PARALLEL LOOP
+!$ACC END KERNELS
 
-!$ACC PARALLEL LOOP
+!$ACC KERNELS
+!$ACC LOOP INDEPENDENT
   DO k=y_min-2,y_max+3
      vertexy(k)=ymin+dy*float(k-y_min)
   ENDDO
-!$ACC END PARALLEL LOOP
+!$ACC END KERNELS
 
-!$ACC PARALLEL LOOP
+!$ACC KERNELS
+!$ACC LOOP INDEPENDENT
   DO k=y_min-2,y_max+3
     vertexdy(k)=dy
   ENDDO
-!$ACC END PARALLEL LOOP
+!$ACC END KERNELS
 
-!$ACC PARALLEL LOOP
+!$ACC KERNELS
+!$ACC LOOP INDEPENDENT
   DO j=x_min-2,x_max+2
      cellx(j)=0.5*(vertexx(j)+vertexx(j+1))
   ENDDO
-!$ACC END PARALLEL LOOP
+!$ACC END KERNELS
 
-!$ACC PARALLEL LOOP
+!$ACC KERNELS
+!$ACC LOOP INDEPENDENT
   DO j=x_min-2,x_max+2
      celldx(j)=dx
   ENDDO
-!$ACC END PARALLEL LOOP
+!$ACC END KERNELS
 
-!$ACC PARALLEL LOOP
+!$ACC KERNELS
+!$ACC LOOP INDEPENDENT
   DO k=y_min-2,y_max+2
      celly(k)=0.5*(vertexy(k)+vertexy(k+1))
   ENDDO
-!$ACC END PARALLEL LOOP
+!$ACC END KERNELS
 
-!$ACC PARALLEL LOOP
+!$ACC KERNELS
+!$ACC LOOP INDEPENDENT
   DO k=y_min-2,y_max+2
      celldy(k)=dy
   ENDDO
-!$ACC END PARALLEL LOOP
+!$ACC END KERNELS
 
-!$ACC PARALLEL LOOP
+!$ACC KERNELS
+!$ACC LOOP INDEPENDENT
   DO k=y_min-2,y_max+2
+!$ACC LOOP INDEPENDENT
     DO j=x_min-2,x_max+2
         volume(j,k)=dx*dy
      ENDDO
   ENDDO
-!$ACC END PARALLEL LOOP
+!$ACC END KERNELS
 
-!$ACC PARALLEL LOOP
+!$ACC KERNELS
+!$ACC LOOP INDEPENDENT
   DO k=y_min-2,y_max+2
+!$ACC LOOP INDEPENDENT
     DO j=x_min-2,x_max+2
         xarea(j,k)=celldy(k)
      ENDDO
   ENDDO
-!$ACC END PARALLEL LOOP
+!$ACC END KERNELS
 
-!$ACC PARALLEL LOOP
+!$ACC KERNELS
+!$ACC LOOP INDEPENDENT
   DO k=y_min-2,y_max+2
-!$ACC LOOP VECTOR
+!$ACC LOOP INDEPENDENT
     DO j=x_min-2,x_max+2
         yarea(j,k)=celldx(j)
      ENDDO
   ENDDO
-!$ACC END PARALLEL LOOP
+!$ACC END KERNELS
 !$ACC END DATA
 
 END SUBROUTINE initialise_chunk_kernel
