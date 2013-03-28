@@ -274,7 +274,7 @@ SUBROUTINE hydro_cycle(c,                 &
 
   WRITE(*,'(11A9)'), "TSTEP", "PDV1", "ACCEL", "PDV2", "FLUX", "ADVEC", "RESET", "FSUMA", "VISIT", "FINAL", "TOTAL"
   WRITE(*,'(11F9.2)'), tt(0:9), sum(tt(0:9))
-  WRITE(*,'(11F9.2)'), 100.*tt(0:9)/sum(tt(0:9)), 100
+  WRITE(*,'(11F9.2)'), 100.*tt(0:9)/sum(tt(0:9)), 100.
 
 END SUBROUTINE hydro_cycle
 
