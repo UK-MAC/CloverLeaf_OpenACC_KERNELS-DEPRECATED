@@ -75,7 +75,7 @@ SUBROUTINE advec_cell_kernel(x_min,       &
 
   INTEGER :: j,k,upwind,donor,downwind,dif
 
-  REAL(KIND=8) :: sigma,sigmat,sigmav,sigmam,sigma3,sigma4
+  REAL(KIND=8) :: wind,sigma,sigmat,sigmav,sigmam,sigma3,sigma4
   REAL(KIND=8) :: diffuw,diffdw,limiter
   !REAL(KIND=8), PARAMETER :: one_by_six=1.0_8/6.0_8
   REAL(KIND=8):: one_by_six
@@ -136,8 +136,10 @@ SUBROUTINE advec_cell_kernel(x_min,       &
 
         diffuw=density1(donor,k)-density1(upwind,k)
         diffdw=density1(downwind,k)-density1(donor,k)
+        wind=1.0_8
+        IF(vdiffdw.LE.0.0) wind=-1.0_8
         IF(diffuw*diffdw.GT.0.0)THEN
-          limiter=(1.0_8-sigmav)*SIGN(1.0_8,diffdw)*MIN(ABS(diffuw),ABS(diffdw)&
+          limiter=(1.0_8-sigmav)*wind*MIN(ABS(diffuw),ABS(diffdw)&
               ,one_by_six*(sigma3*ABS(diffuw)+sigma4*ABS(diffdw)))
         ELSE
           limiter=0.0
@@ -220,8 +222,10 @@ SUBROUTINE advec_cell_kernel(x_min,       &
 
         diffuw=density1(j,donor)-density1(j,upwind)
         diffdw=density1(j,downwind)-density1(j,donor)
+        wind=1.0_8
+        IF(vdiffdw.LE.0.0) wind=-1.0_8
         IF(diffuw*diffdw.GT.0.0)THEN
-          limiter=(1.0_8-sigmav)*SIGN(1.0_8,diffdw)*MIN(ABS(diffuw),ABS(diffdw)&
+          limiter=(1.0_8-sigmav)*wind*MIN(ABS(diffuw),ABS(diffdw)&
               ,one_by_six*(sigma3*ABS(diffuw)+sigma4*ABS(diffdw)))
         ELSE
           limiter=0.0
