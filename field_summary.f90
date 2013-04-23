@@ -95,7 +95,7 @@ SUBROUTINE field_summary(c)
   IF(complete) THEN
     IF(parallel%boss) THEN
         IF(test_problem.EQ.1) THEN
-          qa_diff=ABS((100.0_8*(ke/1.82280367574564_8))-100.0_8)
+          qa_diff=ABS((100.0_8*(ke/1.82280367310258_8))-100.0_8)
           WRITE(*,*)"Test problem 1 is within",qa_diff,"% of the expected solution"
           WRITE(g_out,*)"Test problem 1 is within",qa_diff,"% of the expected solution"
           IF(qa_diff.LT.0.001) THEN
