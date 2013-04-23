@@ -16,7 +16,7 @@
 ! CloverLeaf. If not, see http://www.gnu.org/licenses/.
 
 !>  @brief Fortran momentum advection kernel
-!>  @author Wayne Gaudin
+!>  @author Wayne Gaudin, Andy Herdman
 !>  @details Performs a second order advective remap on the vertex momentum
 !>  using van-Leer limiting and directional splitting.
 !>  Note that although pre_vol is only set and not used in the update, please
@@ -72,7 +72,7 @@ SUBROUTINE advec_mom_kernel(x_min,x_max,y_min,y_max,   &
 
   REAL(KIND=8), DIMENSION(x_min-2:x_max+2) :: celldx
   REAL(KIND=8), DIMENSION(y_min-2:y_max+2) :: celldy
-
+ 
   INTEGER :: j,k,mom_sweep
   INTEGER :: upwind,donor,downwind,dif
   REAL(KIND=8) :: sigma,wind,width

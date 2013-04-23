@@ -43,6 +43,8 @@ SUBROUTINE visit(c)
 
   INTEGER :: fields(NUM_FIELDS)
 
+  REAL(KIND=8) :: kernel_time,timer
+
   name = 'clover'
 
   IF(first_call) THEN
@@ -58,15 +60,21 @@ SUBROUTINE visit(c)
 
   ENDIF
 
+  IF(profiler_on) kernel_time=timer()
   CALL ideal_gas(c,.FALSE.)
+  IF(profiler_on) profiler%ideal_gas=profiler%ideal_gas+(timer()-kernel_time)
 
   fields=0
   fields(FIELD_PRESSURE)=1
   fields(FIELD_XVEL0)=1
   fields(FIELD_YVEL0)=1
+  IF(profiler_on) kernel_time=timer()
   CALL update_halo(c,fields,1)
+  IF(profiler_on) profiler%halo_exchange=profiler%halo_exchange+(timer()-kernel_time)
 
+  IF(profiler_on) kernel_time=timer()
   CALL calc_viscosity(c)
+  IF(profiler_on) profiler%viscosity=profiler%viscosity+(timer()-kernel_time)
 
   IF ( parallel%boss ) THEN
 
@@ -166,6 +174,7 @@ SUBROUTINE visit(c)
     ENDDO
   ENDDO
   CLOSE(u)
+  IF(profiler_on) profiler%visit=profiler%visit+(timer()-kernel_time)
 
 END SUBROUTINE visit
 

@@ -16,7 +16,7 @@
 ! CloverLeaf. If not, see http://www.gnu.org/licenses/.
 
 !>  @brief Fortran viscosity kernel.
-!>  @author Wayne Gaudin
+!>  @author Wayne Gaudin, Andy Herdman
 !>  @details Calculates an artificial viscosity using the Wilkin's method to
 !>  smooth out shock front and prevent oscillations around discontinuities.
 !>  Only cells in compression will have a non-zero value.
@@ -61,34 +61,34 @@ SUBROUTINE viscosity_kernel(x_min,x_max,y_min,y_max,    &
 
       div = (celldx(j)*(ugrad)+  celldy(k)*(vgrad))
 
-      strain2 = 0.5*(xvel0(j,  k+1) + xvel0(j+1,k+1)-xvel0(j  ,k  )-xvel0(j+1,k  ))/celldy(k) &
-              + 0.5*(yvel0(j+1,k  ) + yvel0(j+1,k+1)-yvel0(j  ,k  )-yvel0(j  ,k+1))/celldx(j)
+      strain2 = 0.5_8*(xvel0(j,  k+1) + xvel0(j+1,k+1)-xvel0(j  ,k  )-xvel0(j+1,k  ))/celldy(k) &
+              + 0.5_8*(yvel0(j+1,k  ) + yvel0(j+1,k+1)-yvel0(j  ,k  )-yvel0(j  ,k+1))/celldx(j)
 
       pgradx=(pressure(j+1,k)-pressure(j-1,k))/(celldx(j)+celldx(j+1))
       pgrady=(pressure(j,k+1)-pressure(j,k-1))/(celldy(k)+celldy(k+1))
 
-      pgradx2 = pgradx**2
-      pgrady2 = pgrady**2
+      pgradx2 = pgradx*pgradx
+      pgrady2 = pgrady*pgrady
 
-      limiter = ((0.5*(ugrad)/celldx(j))*pgradx2+(0.5*(vgrad)/celldy(k))*pgrady2+strain2*pgradx*pgrady)  &
+      limiter = ((0.5_8*(ugrad)/celldx(j))*pgradx2+(0.5_8*(vgrad)/celldy(k))*pgrady2+strain2*pgradx*pgrady)  &
               /MAX(pgradx2+pgrady2,1.0e-16_8)
 
-      dirx=1.0_8
-      IF(pgradx.LT.0.0) dirx=-1.0_8
-      pgradx = dirx*MAX(1.0e-16_8,ABS(pgradx))
-      diry=1.0_8
-      IF(pgradx.LT.0.0) diry=-1.0_8
-      pgrady = diry*MAX(1.0e-16_8,ABS(pgrady))
-      pgrad = SQRT(pgradx**2+pgrady**2)
-      xgrad = ABS(celldx(j)*pgrad/pgradx)
-      ygrad = ABS(celldy(k)*pgrad/pgrady)
-      grad  = MIN(xgrad,ygrad)
-      grad2 = grad*grad
-
-      IF (.NOT.((limiter.GT.0.0).OR.(div.GE.0.0)))THEN
-        viscosity(j,k)=2.0_8*density0(j,k)*grad2*limiter**2
-      ELSE
+      IF ((limiter.GT.0.0).OR.(div.GE.0.0))THEN
         viscosity(j,k) = 0.0
+      ELSE
+        dirx=1.0_8
+        IF(pgradx.LT.0.0) dirx=-1.0_8
+        pgradx = dirx*MAX(1.0e-16_8,ABS(pgradx))
+        diry=1.0_8
+        IF(pgradx.LT.0.0) diry=-1.0_8
+        pgrady = diry*MAX(1.0e-16_8,ABS(pgrady))
+        pgrad = SQRT(pgradx**2+pgrady**2)
+        xgrad = ABS(celldx(j)*pgrad/pgradx)
+        ygrad = ABS(celldy(k)*pgrad/pgrady)
+        grad  = MIN(xgrad,ygrad)
+        grad2 = grad*grad
+
+        viscosity(j,k)=2.0_8*density0(j,k)*grad2*limiter*limiter
       ENDIF
 
     ENDDO

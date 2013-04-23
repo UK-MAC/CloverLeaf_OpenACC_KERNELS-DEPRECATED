@@ -16,7 +16,7 @@
 ! CloverLeaf. If not, see http://www.gnu.org/licenses/.
 
 !>  @brief Fortran revert kernel.
-!>  @author Wayne Gaudin
+!>  @author Wayne Gaudin, Andy Herdman
 !>  @details Takes the half step field data used in the predictor and reverts
 !>  it to the start of step data, ready for the corrector.
 !>  Note that this does not seem necessary in this proxy-app but should be

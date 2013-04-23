@@ -32,6 +32,9 @@ SUBROUTINE reset_field(c)
 
   INTEGER :: c
 
+  REAL(KIND=8) :: kernel_time,timer
+
+  IF(profiler_on) kernel_time=timer()
   IF(use_fortran_kernels)THEN
     CALL reset_field_kernel(chunks(c)%field%x_min,   &
                           chunks(c)%field%x_max,     &
@@ -59,6 +62,7 @@ SUBROUTINE reset_field(c)
                           chunks(c)%field%yvel0,     &
                           chunks(c)%field%yvel1      )
   ENDIF
+  IF(profiler_on) profiler%reset=profiler%reset+(timer()-kernel_time)
 
 END SUBROUTINE reset_field
 

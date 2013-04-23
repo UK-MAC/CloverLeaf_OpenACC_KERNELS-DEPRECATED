@@ -32,6 +32,9 @@ SUBROUTINE accelerate(c)
 
   INTEGER :: c
 
+  REAL(KIND=8) :: kernel_time,timer
+
+  IF(profiler_on) kernel_time=timer()
   IF(use_fortran_kernels) THEN
     CALL accelerate_kernel(chunks(c)%field%x_min,                &
                          chunks(c)%field%x_max,                  &
@@ -67,6 +70,7 @@ SUBROUTINE accelerate(c)
                          chunks(c)%field%yvel1,                  &
                          chunks(c)%field%work_array1             )
   ENDIF
+  IF(profiler_on) profiler%acceleration=profiler%acceleration+(timer()-kernel_time)
 
 END SUBROUTINE accelerate
 

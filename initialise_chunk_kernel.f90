@@ -16,7 +16,7 @@
 ! CloverLeaf. If not, see http://www.gnu.org/licenses/.
 
 !>  @brief Fortran chunk initialisation kernel.
-!>  @author Wayne Gaudin
+!>  @author Wayne Gaudin, Andy Herdman
 !>  @details Calculates mesh geometry for the mesh chunk based on the mesh size.
 
 MODULE initialise_chunk_kernel_module

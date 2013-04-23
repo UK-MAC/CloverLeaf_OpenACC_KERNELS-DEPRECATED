@@ -32,6 +32,9 @@ SUBROUTINE flux_calc(c)
 
   INTEGER :: c
 
+  REAL(KIND=8) :: kernel_time,timer
+
+  IF(profiler_on) kernel_time=timer()
   IF(use_fortran_kernels)THEN
     CALL flux_calc_kernel(chunks(c)%field%x_min,         &
                         chunks(c)%field%x_max,           &
@@ -61,6 +64,7 @@ SUBROUTINE flux_calc(c)
                         chunks(c)%field%vol_flux_x,      &
                         chunks(c)%field%vol_flux_y       )
   ENDIF
+  IF(profiler_on) profiler%flux=profiler%flux+(timer()-kernel_time)
 
 END SUBROUTINE flux_calc
 

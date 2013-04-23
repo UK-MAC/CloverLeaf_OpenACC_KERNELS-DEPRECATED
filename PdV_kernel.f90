@@ -16,7 +16,7 @@
 ! CloverLeaf. If not, see http://www.gnu.org/licenses/.
 
 !>  @brief Fortran PdV kernel.
-!>  @author Wayne Gaudin
+!>  @author Wayne Gaudin, Andy Herdman
 !>  @details Calculates the change in energy and density in a cell using the
 !>  change on cell volume due to the velocity gradients in a cell. The time
 !>  level of the velocity data depends on whether it is invoked as the

@@ -42,6 +42,8 @@ SUBROUTINE timestep(c)
   REAL(KIND=8)    :: dtlp
   REAL(KIND=8)    :: x_pos,y_pos,xl_pos,yl_pos
 
+  REAL(KIND=8)    :: kernel_time,timer
+
   CHARACTER(LEN=8) :: dt_control,dtl_control
 
   INTEGER :: small
@@ -52,7 +54,9 @@ SUBROUTINE timestep(c)
   dt    = g_big
   small=0
 
+  IF(profiler_on) kernel_time=timer()
   CALL ideal_gas(c,.FALSE.)
+  IF(profiler_on) profiler%ideal_gas=profiler%ideal_gas+(timer()-kernel_time)
 
   fields=0
   fields(FIELD_PRESSURE)=1
@@ -60,14 +64,21 @@ SUBROUTINE timestep(c)
   fields(FIELD_DENSITY0)=1
   fields(FIELD_XVEL0)=1
   fields(FIELD_YVEL0)=1
+  IF(profiler_on) kernel_time=timer()
   CALL update_halo(c,fields,1)
+  IF(profiler_on) profiler%halo_exchange=profiler%halo_exchange+(timer()-kernel_time)
 
+  IF(profiler_on) kernel_time=timer()
   CALL calc_viscosity(c)
+  IF(profiler_on) profiler%viscosity=profiler%viscosity+(timer()-kernel_time)
 
   fields=0
   fields(FIELD_VISCOSITY)=1
+  IF(profiler_on) kernel_time=timer()
   CALL update_halo(c,fields,1)
+  IF(profiler_on) profiler%halo_exchange=profiler%halo_exchange+(timer()-kernel_time)
 
+  IF(profiler_on) kernel_time=timer()
   CALL calc_dt(c,dtlp,dtl_control,xl_pos,yl_pos,jldt,kldt)
 
   IF(dtlp.LE.dt) THEN
@@ -82,6 +93,7 @@ SUBROUTINE timestep(c)
   dt = MIN(dt, (dtold * dtrise), dtmax)
 
   CALL clover_min(dt)
+  IF(profiler_on) profiler%timestep=profiler%timestep+(timer()-kernel_time)
 
   IF(dt.LT.dtmin) small=1
 

@@ -16,7 +16,7 @@
 ! CloverLeaf. If not, see http://www.gnu.org/licenses/.
 
 !>  @brief Fortran timestep kernel
-!>  @author Wayne Gaudin
+!>  @author Wayne Gaudin, Andy Herdman
 !>  @details Calculates the minimum timestep on the mesh chunk based on the CFL
 !>  condition, the velocity gradient and the velocity divergence. A safety
 !>  factor is used to ensure numerical stability.
@@ -101,12 +101,12 @@ SUBROUTINE calc_dt_kernel(x_min,x_max,y_min,y_max,             &
        dsy=celldy(k)
 
        cc=soundspeed(j,k)**2
-       cc=cc+2.0*viscosity_a(j,k)/density0(j,k)
+       cc=cc+2.0_8*viscosity_a(j,k)/density0(j,k)
        !cc=MAX(cc,g_small) ! Still causes a seg fault
        cc=MAX(cc,1.0e-16)
        cc=SQRT(cc)
 
-       dtct=dtc_safe*MIN(dsx,dsy)/cc 
+       dtct=dtc_safe*MIN(dsx,dsy)/cc
 
        div=0.0
 
@@ -115,25 +115,24 @@ SUBROUTINE calc_dt_kernel(x_min,x_max,y_min,y_max,             &
 
        div=div+dv2-dv1
 
-       dtut=dtu_safe*2.0*volume(j,k)/MAX(ABS(dv1),ABS(dv2),g_small*volume(j,k))
+       dtut=dtu_safe*2.0_8*volume(j,k)/MAX(ABS(dv1),ABS(dv2),g_small*volume(j,k))
 
        dv1=(yvel0(j,k  )+yvel0(j+1,k  ))*yarea(j,k  )
        dv2=(yvel0(j,k+1)+yvel0(j+1,k+1))*yarea(j,k+1)
 
        div=div+dv2-dv1
 
-       dtvt=dtv_safe*2.0*volume(j,k)/MAX(ABS(dv1),ABS(dv2),g_small*volume(j,k)) 
+       dtvt=dtv_safe*2.0_8*volume(j,k)/MAX(ABS(dv1),ABS(dv2),g_small*volume(j,k))
 
-       div=div/(2.0*volume(j,k))
+       div=div/(2.0_8*volume(j,k))
 
        IF(div.LT.-g_small)THEN
-         dtdivt=dtdiv_safe*(-1.0/div)
+         dtdivt=dtdiv_safe*(-1.0_8/div)
        ELSE
          dtdivt=g_big
        ENDIF
 
        dt_min(j,k)=MIN(dtct,dtut,dtvt,dtdivt)
-       !dt_min(j,k)=0.0001
 
     ENDDO
   ENDDO

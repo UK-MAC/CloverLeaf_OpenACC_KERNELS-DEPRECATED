@@ -16,7 +16,7 @@
 ! CloverLeaf. If not, see http://www.gnu.org/licenses/.
 
 !>  @brief Fortran kernel to update the external halo cells in a chunk.
-!>  @author Wayne Gaudin
+!>  @author Wayne Gaudin, Andy Herdman
 !>  @details Updates halo cells for the required fields at the required depth
 !>  for any halo cells that lie on an external boundary. The location and type
 !>  of data governs how this is carried out. External boundaries are always

@@ -197,6 +197,8 @@ SUBROUTINE start
   INTEGER :: x_cells,y_cells
   INTEGER, ALLOCATABLE :: right(:),left(:),top(:),bottom(:)
 
+  LOGICAL :: profiler_off
+
   IF(parallel%boss)THEN
      WRITE(g_out,*) 'Setting up initial geometry'
      WRITE(g_out,*)
@@ -297,6 +299,11 @@ SUBROUTINE start
 
 
   CALL clover_barrier
+
+  ! Do no profile the start up costs otherwise the total times will not add up
+  ! at the end
+  profiler_off=profiler_on
+  profiler_on=.FALSE.
 
 END SUBROUTINE start
 
