@@ -101,6 +101,7 @@ SUBROUTINE generate_on_device(c,x_min,x_max,y_min,y_max,&
   REAL(KIND=8) :: bottom_snd_buffer(:),bottom_rcv_buffer(:),top_snd_buffer(:),top_rcv_buffer(:)
 
   INTEGER :: fields(NUM_FIELDS)
+  LOGICAL :: profiler_off
 
 !$ACC DATA                    &
 !$ACC COPY(density0)          &
@@ -137,6 +138,11 @@ SUBROUTINE generate_on_device(c,x_min,x_max,y_min,y_max,&
 !$ACC COPY(bottom_rcv_buffer) &
 !$ACC COPY(top_snd_buffer)    &
 !$ACC COPY(top_rcv_buffer)
+
+  ! Do no profile the start up costs otherwise the total times will not add up
+  ! at the end
+  profiler_off=profiler_on
+  profiler_on=.FALSE.
 
   CALL initialise_chunk(c)
 
@@ -178,6 +184,10 @@ SUBROUTINE generate_on_device(c,x_min,x_max,y_min,y_max,&
 
 !$ACC END DATA
 
+  CALL clover_barrier
+
+  profiler_on=profiler_off
+
 END SUBROUTINE generate_on_device
 
 END MODULE generate_on_device_module
@@ -196,8 +206,6 @@ SUBROUTINE start
 
   INTEGER :: x_cells,y_cells
   INTEGER, ALLOCATABLE :: right(:),left(:),top(:),bottom(:)
-
-  LOGICAL :: profiler_off
 
   IF(parallel%boss)THEN
      WRITE(g_out,*) 'Setting up initial geometry'
@@ -296,14 +304,6 @@ SUBROUTINE start
                           chunks(parallel%task+1)%bottom_rcv_buffer, &
                           chunks(parallel%task+1)%top_snd_buffer,    &
                           chunks(parallel%task+1)%top_rcv_buffer)
-
-
-  CALL clover_barrier
-
-  ! Do no profile the start up costs otherwise the total times will not add up
-  ! at the end
-  profiler_off=profiler_on
-  profiler_on=.FALSE.
 
 END SUBROUTINE start
 
