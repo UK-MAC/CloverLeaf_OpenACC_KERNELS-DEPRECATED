@@ -103,7 +103,7 @@ SUBROUTINE calc_dt_kernel(x_min,x_max,y_min,y_max,             &
        cc=soundspeed(j,k)*soundspeed(j,k)
        cc=cc+2.0_8*viscosity_a(j,k)/density0(j,k)
        !cc=MAX(cc,g_small) ! Still causes a seg fault
-       cc=MAX(cc,1.0e-16)
+       cc=MAX(cc,1.0e-16_8)
        cc=SQRT(cc)
 
        dtct=dtc_safe*MIN(dsx,dsy)/cc
@@ -137,6 +137,7 @@ SUBROUTINE calc_dt_kernel(x_min,x_max,y_min,y_max,             &
     ENDDO
   ENDDO
 
+! PGI fix is to comment of the two clauses below. Expected to work in PGI 13.5
 !$ACC LOOP INDEPENDENT REDUCTION(min:dt_min_val) GANG(128)
   DO k=y_min,y_max
 !$ACC LOOP INDEPENDENT REDUCTION(min:dt_min_val) WORKER(64)
