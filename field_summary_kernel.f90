@@ -64,12 +64,6 @@ SUBROUTINE field_summary_kernel(x_min,x_max,y_min,y_max, &
           vsqrd=vsqrd+0.25*(xvel0(jv,kv)**2+yvel0(jv,kv)**2)
         ENDDO
       ENDDO
-!     
-!     
-!    vsqrd=(xvel0(j,k)**2+yvel0(j,k)**2) ! Fixes for PGI, though not quite the same
-!    Comment out the kv, jv loop and the two ACC LOOP clauses above
-!    Expected to work in PGI 13.5
-!     
       cell_vol=volume(j,k)
       cell_mass=cell_vol*density0(j,k)
       vol=vol+cell_vol

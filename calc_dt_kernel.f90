@@ -136,7 +136,6 @@ SUBROUTINE calc_dt_kernel(x_min,x_max,y_min,y_max,             &
     ENDDO
   ENDDO
 
-! PGI fix is to comment of the two clauses below. Expected to work in PGI 13.5
 !$ACC LOOP INDEPENDENT REDUCTION(min:dt_min_val) GANG(128)
   DO k=y_min,y_max
 !$ACC LOOP INDEPENDENT REDUCTION(min:dt_min_val) WORKER(64)
