@@ -52,7 +52,6 @@ SUBROUTINE advec_cell_kernel(x_min,       &
   INTEGER :: x_min,x_max,y_min,y_max
   INTEGER :: sweep_number,dir
   INTEGER :: g_xdir=1,g_ydir=2
-  LOGICAL :: vector
 
   REAL(KIND=8), DIMENSION(x_min-2:x_max+2,y_min-2:y_max+2) :: volume
   REAL(KIND=8), DIMENSION(x_min-2:x_max+2,y_min-2:y_max+2) :: density1
@@ -106,9 +105,9 @@ SUBROUTINE advec_cell_kernel(x_min,       &
       ENDDO 
     ENDIF
 
-!$ACC LOOP INDEPENDENT
+!$ACC LOOP INDEPENDENT PRIVATE(upwind,donor,downwind,dif,sigmat,sigma3,sigma4,sigmav,sigma,sigmam,diffuw,diffdw,limiter,wind)
     DO k=y_min,y_max
-!$ACC LOOP INDEPENDENT PRIVATE(upwind,donor,downwind,dif,sigmat,sigma3,sigma4,sigmav,sigma,sigmam,diffuw,diffdw,limiter)
+!$ACC LOOP INDEPENDENT
       DO j=x_min,x_max+2
 
         IF(vol_flux_x(j,k).GT.0.0)THEN
@@ -194,9 +193,9 @@ SUBROUTINE advec_cell_kernel(x_min,       &
       ENDDO
     ENDIF
 
-!$ACC LOOP INDEPENDENT
+!$ACC LOOP INDEPENDENT PRIVATE(upwind,donor,downwind,dif,sigmat,sigma3,sigma4,sigmav,sigma,sigmam,diffuw,diffdw,limiter,wind)
     DO k=y_min,y_max+2
-!$ACC LOOP INDEPENDENT PRIVATE(upwind,donor,downwind,dif,sigmat,sigma3,sigma4,sigmav,sigma,sigmam,diffuw,diffdw,limiter)
+!$ACC LOOP INDEPENDENT
       DO j=x_min,x_max
 
         IF(vol_flux_y(j,k).GT.0.0)THEN
