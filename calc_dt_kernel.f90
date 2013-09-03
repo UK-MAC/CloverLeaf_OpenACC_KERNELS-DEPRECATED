@@ -93,9 +93,9 @@ SUBROUTINE calc_dt_kernel(x_min,x_max,y_min,y_max,             &
   jk_control=1.1
 
 !$ACC KERNELS
-!$ACC LOOP INDEPENDENT
-  DO k=y_min,y_max
 !$ACC LOOP INDEPENDENT PRIVATE(dsx,dsy,cc,dv1,dv2,div,dtct,dtut,dtvt,dtdivt)
+  DO k=y_min,y_max
+!$ACC LOOP INDEPENDENT
     DO j=x_min,x_max
 
        dsx=celldx(j)
@@ -138,7 +138,7 @@ SUBROUTINE calc_dt_kernel(x_min,x_max,y_min,y_max,             &
 
 !$ACC LOOP INDEPENDENT REDUCTION(min:dt_min_val) GANG(128)
   DO k=y_min,y_max
-!$ACC LOOP INDEPENDENT REDUCTION(min:dt_min_val) WORKER(64)
+!$ACC LOOP INDEPENDENT
     DO j=x_min,x_max
       IF(dt_min(j,k).LT.dt_min_val) dt_min_val=dt_min(j,k)
     ENDDO
