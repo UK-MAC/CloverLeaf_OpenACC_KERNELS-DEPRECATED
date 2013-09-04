@@ -54,9 +54,9 @@ SUBROUTINE field_summary_kernel(x_min,x_max,y_min,y_max, &
 !$ACC DATA &
 !$ACC PRESENT(volume,density0,energy0,pressure,xvel0,yvel0)
 !$ACC KERNELS
-!$ACC LOOP INDEPENDENT REDUCTION(+:vol) REDUCTION(+:mass) REDUCTION(+:press) REDUCTION(+:ie) REDUCTION(+:ke), private(jv,kv,vsqrd,cell_vol,cell_mass) GANG(128)
+!$ACC LOOP INDEPENDENT REDUCTION(+:vol) REDUCTION(+:mass) REDUCTION(+:press) REDUCTION(+:ie) REDUCTION(+:ke), private(vsqrd,cell_vol,cell_mass,jv,kv) GANG(128)
   DO k=y_min,y_max
-!$ACC LOOP INDEPENDENT
+!$ACC LOOP INDEPENDENT REDUCTION(+:vol) REDUCTION(+:mass) REDUCTION(+:press) REDUCTION(+:ie) REDUCTION(+:ke)
     DO j=x_min,x_max
       vsqrd=0.0
       DO kv=k,k+1
