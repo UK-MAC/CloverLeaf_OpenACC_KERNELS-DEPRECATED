@@ -147,9 +147,9 @@ SUBROUTINE pack_top_bottom_buffers(x_min,x_max,y_min,y_max,              &
 !$ACC PRESENT(bottom_snd_buffer,field)
 !$ACC KERNELS
 !$ACC LOOP INDEPENDENT
-    DO k=1,depth
+    DO j=x_min-depth,x_max+x_inc+depth
 !$ACC LOOP INDEPENDENT
-      DO j=x_min-depth,x_max+x_inc+depth
+      DO k=1,depth
         index=j+depth+(k-1)*(x_max+x_inc+(2*depth))
         bottom_snd_buffer(index)=field(j,y_min+y_inc-1+k)
       ENDDO
