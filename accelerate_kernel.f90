@@ -121,6 +121,7 @@ SUBROUTINE accelerate_kernel(x_min,x_max,y_min,y_max,dt,     &
   ENDDO
 
 !$ACC END KERNELS
+!$ACC WAIT
 
 !$ACC END DATA
 

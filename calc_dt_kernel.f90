@@ -41,7 +41,7 @@ SUBROUTINE calc_dt_kernel(x_min,x_max,y_min,y_max,             &
                           density0,                            &
                           energy0,                             &
                           pressure,                            &
-                          viscosity_a,                           &
+                          viscosity_a,                         &
                           soundspeed,                          &
                           xvel0,yvel0,                         &
                           dt_min,                              &
@@ -86,7 +86,8 @@ SUBROUTINE calc_dt_kernel(x_min,x_max,y_min,y_max,             &
   small=0
 !$ACC DATA    &
 !$ACC PRESENT(celldx,celldy,cellx,celly,density0,soundspeed,viscosity_a,volume) &
-!$ACC PRESENT(xarea,xvel0,yarea,yvel0,dt_min)
+!$ACC PRESENT(xarea,xvel0,yarea,yvel0,dt_min) &
+!$ACC COPYIN(g_small)
 
   dt_min_val = g_big
   jk_control=1.1
@@ -102,9 +103,7 @@ SUBROUTINE calc_dt_kernel(x_min,x_max,y_min,y_max,             &
 
        cc=soundspeed(j,k)*soundspeed(j,k)
        cc=cc+2.0_8*viscosity_a(j,k)/density0(j,k)
-       !cc=MAX(cc,g_small) ! Still causes a seg fault
-       cc=MAX(cc,1.0e-16_8)
-       cc=SQRT(cc)
+       cc=MAX(SQRT(cc),g_small)
 
        dtct=dtc_safe*MIN(dsx,dsy)/cc
 
@@ -137,10 +136,9 @@ SUBROUTINE calc_dt_kernel(x_min,x_max,y_min,y_max,             &
     ENDDO
   ENDDO
 
-! PGI fix is to comment of the two clauses below. Expected to work in PGI 13.5
 !$ACC LOOP INDEPENDENT REDUCTION(min:dt_min_val) GANG(128)
   DO k=y_min,y_max
-!$ACC LOOP INDEPENDENT REDUCTION(min:dt_min_val) WORKER(64)
+!$ACC LOOP INDEPENDENT REDUCTION(min:dt_min_val)
     DO j=x_min,x_max
       IF(dt_min(j,k).LT.dt_min_val) dt_min_val=dt_min(j,k)
     ENDDO
