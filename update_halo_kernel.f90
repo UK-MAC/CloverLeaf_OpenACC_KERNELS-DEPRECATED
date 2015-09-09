@@ -104,6 +104,7 @@ CONTAINS
     ENDIF
     IF(chunk_neighbours(CHUNK_TOP).EQ.EXTERNAL_FACE) THEN
 !$ACC KERNELS
+
 !$ACC LOOP INDEPENDENT
       DO j=x_min-depth,x_max+depth
 !$ACC LOOP INDEPENDENT
@@ -112,6 +113,7 @@ CONTAINS
         ENDDO
       ENDDO
 !$ACC END KERNELS
+
     ENDIF
     IF(chunk_neighbours(CHUNK_LEFT).EQ.EXTERNAL_FACE) THEN
 !$ACC KERNELS
@@ -123,6 +125,7 @@ CONTAINS
         ENDDO
       ENDDO
 !$ACC END KERNELS
+
     ENDIF
     IF(chunk_neighbours(CHUNK_RIGHT).EQ.EXTERNAL_FACE) THEN
 !$ACC KERNELS
@@ -134,12 +137,14 @@ CONTAINS
         ENDDO
       ENDDO
 !$ACC END KERNELS
+
     ENDIF
   ENDIF
 
   IF(fields(FIELD_DENSITY1).EQ.1) THEN
     IF(chunk_neighbours(CHUNK_BOTTOM).EQ.EXTERNAL_FACE) THEN
 !$ACC KERNELS
+
 !$ACC LOOP INDEPENDENT
       DO j=x_min-depth,x_max+depth
 !$ACC LOOP INDEPENDENT
@@ -148,9 +153,11 @@ CONTAINS
         ENDDO
       ENDDO
 !$ACC END KERNELS
+
     ENDIF
     IF(chunk_neighbours(CHUNK_TOP).EQ.EXTERNAL_FACE) THEN
 !$ACC KERNELS
+
 !$ACC LOOP INDEPENDENT
       DO j=x_min-depth,x_max+depth
 !$ACC LOOP INDEPENDENT
@@ -159,9 +166,11 @@ CONTAINS
         ENDDO
       ENDDO
 !$ACC END KERNELS
+
     ENDIF
     IF(chunk_neighbours(CHUNK_LEFT).EQ.EXTERNAL_FACE) THEN
 !$ACC KERNELS
+
 !$ACC LOOP INDEPENDENT
       DO k=y_min-depth,y_max+depth
 !$ACC LOOP INDEPENDENT
@@ -170,9 +179,11 @@ CONTAINS
         ENDDO
       ENDDO
 !$ACC END KERNELS
+
     ENDIF
     IF(chunk_neighbours(CHUNK_RIGHT).EQ.EXTERNAL_FACE) THEN
 !$ACC KERNELS
+
 !$ACC LOOP INDEPENDENT
       DO k=y_min-depth,y_max+depth
 !$ACC LOOP INDEPENDENT
@@ -181,12 +192,14 @@ CONTAINS
         ENDDO
       ENDDO
 !$ACC END KERNELS
+
     ENDIF
   ENDIF
 
   IF(fields(FIELD_ENERGY0).EQ.1) THEN
     IF(chunk_neighbours(CHUNK_BOTTOM).EQ.EXTERNAL_FACE) THEN
 !$ACC KERNELS
+
 !$ACC LOOP INDEPENDENT
       DO j=x_min-depth,x_max+depth
 !$ACC LOOP INDEPENDENT
@@ -195,9 +208,11 @@ CONTAINS
         ENDDO
       ENDDO
 !$ACC END KERNELS
+
     ENDIF
     IF(chunk_neighbours(CHUNK_TOP).EQ.EXTERNAL_FACE) THEN
 !$ACC KERNELS
+
 !$ACC LOOP INDEPENDENT
       DO j=x_min-depth,x_max+depth
 !$ACC LOOP INDEPENDENT
@@ -206,9 +221,11 @@ CONTAINS
         ENDDO
       ENDDO
 !$ACC END KERNELS
+
     ENDIF
     IF(chunk_neighbours(CHUNK_LEFT).EQ.EXTERNAL_FACE) THEN
 !$ACC KERNELS
+
 !$ACC LOOP INDEPENDENT
       DO k=y_min-depth,y_max+depth
 !$ACC LOOP INDEPENDENT
@@ -217,9 +234,11 @@ CONTAINS
         ENDDO
       ENDDO
 !$ACC END KERNELS
+
     ENDIF
     IF(chunk_neighbours(CHUNK_RIGHT).EQ.EXTERNAL_FACE) THEN
 !$ACC KERNELS
+
 !$ACC LOOP INDEPENDENT
       DO k=y_min-depth,y_max+depth
 !$ACC LOOP INDEPENDENT
@@ -228,12 +247,14 @@ CONTAINS
         ENDDO
       ENDDO
 !$ACC END KERNELS
+
     ENDIF
   ENDIF
 
   IF(fields(FIELD_ENERGY1).EQ.1) THEN
     IF(chunk_neighbours(CHUNK_BOTTOM).EQ.EXTERNAL_FACE) THEN
 !$ACC KERNELS
+
 !$ACC LOOP INDEPENDENT
       DO j=x_min-depth,x_max+depth
 !$ACC LOOP INDEPENDENT
@@ -242,9 +263,11 @@ CONTAINS
         ENDDO
       ENDDO
 !$ACC END KERNELS
+
     ENDIF
     IF(chunk_neighbours(CHUNK_TOP).EQ.EXTERNAL_FACE) THEN
 !$ACC KERNELS
+
 !$ACC LOOP INDEPENDENT
       DO j=x_min-depth,x_max+depth
 !$ACC LOOP INDEPENDENT
@@ -253,9 +276,11 @@ CONTAINS
         ENDDO
       ENDDO
 !$ACC END KERNELS
+
     ENDIF
     IF(chunk_neighbours(CHUNK_LEFT).EQ.EXTERNAL_FACE) THEN
 !$ACC KERNELS
+
 !$ACC LOOP INDEPENDENT
       DO k=y_min-depth,y_max+depth
 !$ACC LOOP INDEPENDENT
@@ -264,9 +289,11 @@ CONTAINS
         ENDDO
       ENDDO
 !$ACC END KERNELS
+
     ENDIF
     IF(chunk_neighbours(CHUNK_RIGHT).EQ.EXTERNAL_FACE) THEN
 !$ACC KERNELS
+
 !$ACC LOOP INDEPENDENT
       DO k=y_min-depth,y_max+depth
 !$ACC LOOP INDEPENDENT
@@ -275,12 +302,14 @@ CONTAINS
         ENDDO
       ENDDO
 !$ACC END KERNELS
+
     ENDIF
   ENDIF
 
   IF(fields(FIELD_PRESSURE).EQ.1) THEN
     IF(chunk_neighbours(CHUNK_BOTTOM).EQ.EXTERNAL_FACE) THEN
 !$ACC KERNELS
+
 !$ACC LOOP INDEPENDENT
       DO j=x_min-depth,x_max+depth
 !$ACC LOOP INDEPENDENT
@@ -289,9 +318,11 @@ CONTAINS
         ENDDO
       ENDDO
 !$ACC END KERNELS
+
     ENDIF
     IF(chunk_neighbours(CHUNK_TOP).EQ.EXTERNAL_FACE) THEN
 !$ACC KERNELS
+
 !$ACC LOOP INDEPENDENT
       DO j=x_min-depth,x_max+depth
 !$ACC LOOP INDEPENDENT
@@ -300,9 +331,11 @@ CONTAINS
         ENDDO
       ENDDO
 !$ACC END KERNELS
+
     ENDIF
     IF(chunk_neighbours(CHUNK_LEFT).EQ.EXTERNAL_FACE) THEN
 !$ACC KERNELS
+
 !$ACC LOOP INDEPENDENT
       DO k=y_min-depth,y_max+depth
 !$ACC LOOP INDEPENDENT
@@ -311,9 +344,11 @@ CONTAINS
         ENDDO
       ENDDO
 !$ACC END KERNELS
+
     ENDIF
     IF(chunk_neighbours(CHUNK_RIGHT).EQ.EXTERNAL_FACE) THEN
 !$ACC KERNELS
+
 !$ACC LOOP INDEPENDENT
       DO k=y_min-depth,y_max+depth
 !$ACC LOOP INDEPENDENT
@@ -322,12 +357,14 @@ CONTAINS
         ENDDO
       ENDDO
 !$ACC END KERNELS
+
     ENDIF
   ENDIF
 
   IF(fields(FIELD_VISCOSITY).EQ.1) THEN
     IF(chunk_neighbours(CHUNK_BOTTOM).EQ.EXTERNAL_FACE) THEN
 !$ACC KERNELS
+
 !$ACC LOOP INDEPENDENT
       DO j=x_min-depth,x_max+depth
 !$ACC LOOP INDEPENDENT
@@ -336,9 +373,11 @@ CONTAINS
         ENDDO
       ENDDO
 !$ACC END KERNELS
+
     ENDIF
     IF(chunk_neighbours(CHUNK_TOP).EQ.EXTERNAL_FACE) THEN
 !$ACC KERNELS
+
 !$ACC LOOP INDEPENDENT
       DO j=x_min-depth,x_max+depth
 !$ACC LOOP INDEPENDENT
@@ -347,9 +386,11 @@ CONTAINS
         ENDDO
       ENDDO
 !$ACC END KERNELS
+
     ENDIF
     IF(chunk_neighbours(CHUNK_LEFT).EQ.EXTERNAL_FACE) THEN
 !$ACC KERNELS
+
 !$ACC LOOP INDEPENDENT
       DO k=y_min-depth,y_max+depth
 !$ACC LOOP INDEPENDENT
@@ -358,9 +399,11 @@ CONTAINS
         ENDDO
       ENDDO
 !$ACC END KERNELS
+
     ENDIF
     IF(chunk_neighbours(CHUNK_RIGHT).EQ.EXTERNAL_FACE) THEN
 !$ACC KERNELS
+
 !$ACC LOOP INDEPENDENT
       DO k=y_min-depth,y_max+depth
 !$ACC LOOP INDEPENDENT
@@ -369,12 +412,14 @@ CONTAINS
         ENDDO
       ENDDO
 !$ACC END KERNELS
+
     ENDIF
   ENDIF
 
   IF(fields(FIELD_SOUNDSPEED).EQ.1) THEN
     IF(chunk_neighbours(CHUNK_BOTTOM).EQ.EXTERNAL_FACE) THEN
 !$ACC KERNELS
+
 !$ACC LOOP INDEPENDENT
       DO j=x_min-depth,x_max+depth
 !$ACC LOOP INDEPENDENT
@@ -383,9 +428,11 @@ CONTAINS
         ENDDO
       ENDDO
 !$ACC END KERNELS
+
     ENDIF
     IF(chunk_neighbours(CHUNK_TOP).EQ.EXTERNAL_FACE) THEN
 !$ACC KERNELS
+
 !$ACC LOOP INDEPENDENT
       DO j=x_min-depth,x_max+depth
 !$ACC LOOP INDEPENDENT
@@ -394,9 +441,11 @@ CONTAINS
         ENDDO
       ENDDO
 !$ACC END KERNELS
+
     ENDIF
     IF(chunk_neighbours(CHUNK_LEFT).EQ.EXTERNAL_FACE) THEN
 !$ACC KERNELS
+
 !$ACC LOOP INDEPENDENT
       DO k=y_min-depth,y_max+depth
 !$ACC LOOP INDEPENDENT
@@ -405,9 +454,11 @@ CONTAINS
         ENDDO
       ENDDO
 !$ACC END KERNELS
+
     ENDIF
     IF(chunk_neighbours(CHUNK_RIGHT).EQ.EXTERNAL_FACE) THEN
 !$ACC KERNELS
+
 !$ACC LOOP INDEPENDENT
       DO k=y_min-depth,y_max+depth
 !$ACC LOOP INDEPENDENT
@@ -416,12 +467,14 @@ CONTAINS
         ENDDO
       ENDDO
 !$ACC END KERNELS
+
     ENDIF
   ENDIF
 
   IF(fields(FIELD_XVEL0).EQ.1) THEN
     IF(chunk_neighbours(CHUNK_BOTTOM).EQ.EXTERNAL_FACE) THEN
 !$ACC KERNELS
+
 !$ACC LOOP INDEPENDENT
       DO j=x_min-depth,x_max+1+depth
 !$ACC LOOP INDEPENDENT
@@ -430,9 +483,11 @@ CONTAINS
         ENDDO
       ENDDO
 !$ACC END KERNELS
+
     ENDIF
     IF(chunk_neighbours(CHUNK_TOP).EQ.EXTERNAL_FACE) THEN
 !$ACC KERNELS
+
 !$ACC LOOP INDEPENDENT
       DO j=x_min-depth,x_max+1+depth
 !$ACC LOOP INDEPENDENT
@@ -441,9 +496,11 @@ CONTAINS
         ENDDO
       ENDDO
 !$ACC END KERNELS
+
     ENDIF
     IF(chunk_neighbours(CHUNK_LEFT).EQ.EXTERNAL_FACE) THEN
 !$ACC KERNELS
+
 !$ACC LOOP INDEPENDENT
       DO k=y_min-depth,y_max+1+depth
 !$ACC LOOP INDEPENDENT
@@ -452,9 +509,11 @@ CONTAINS
         ENDDO
       ENDDO
 !$ACC END KERNELS
+
     ENDIF
     IF(chunk_neighbours(CHUNK_RIGHT).EQ.EXTERNAL_FACE) THEN
 !$ACC KERNELS
+
 !$ACC LOOP INDEPENDENT
       DO k=y_min-depth,y_max+1+depth
 !$ACC LOOP INDEPENDENT
@@ -463,12 +522,14 @@ CONTAINS
         ENDDO
       ENDDO
 !$ACC END KERNELS
+
     ENDIF
   ENDIF
 
   IF(fields(FIELD_XVEL1).EQ.1) THEN
     IF(chunk_neighbours(CHUNK_BOTTOM).EQ.EXTERNAL_FACE) THEN
 !$ACC KERNELS
+
 !$ACC LOOP INDEPENDENT
       DO j=x_min-depth,x_max+1+depth
 !$ACC LOOP INDEPENDENT
@@ -477,9 +538,11 @@ CONTAINS
         ENDDO
       ENDDO
 !$ACC END KERNELS
+
     ENDIF
     IF(chunk_neighbours(CHUNK_TOP).EQ.EXTERNAL_FACE) THEN
 !$ACC KERNELS
+
 !$ACC LOOP INDEPENDENT
       DO j=x_min-depth,x_max+1+depth
 !$ACC LOOP INDEPENDENT
@@ -488,6 +551,7 @@ CONTAINS
         ENDDO
       ENDDO
 !$ACC END KERNELS
+
     ENDIF
     IF(chunk_neighbours(CHUNK_LEFT).EQ.EXTERNAL_FACE) THEN
 !$ACC KERNELS

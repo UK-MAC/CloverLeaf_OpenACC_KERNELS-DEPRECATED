@@ -23,7 +23,7 @@ MODULE reset_field_module
 
 CONTAINS
 
-SUBROUTINE reset_field(c)
+SUBROUTINE reset_field()
 
   USE clover_module
   USE reset_field_kernel_module
@@ -35,33 +35,41 @@ SUBROUTINE reset_field(c)
   REAL(KIND=8) :: kernel_time,timer
 
   IF(profiler_on) kernel_time=timer()
-  IF(use_fortran_kernels)THEN
-    CALL reset_field_kernel(chunks(c)%field%x_min,   &
-                          chunks(c)%field%x_max,     &
-                          chunks(c)%field%y_min,     &
-                          chunks(c)%field%y_max,     &
-                          chunks(c)%field%density0,  &
-                          chunks(c)%field%density1,  &
-                          chunks(c)%field%energy0,   &
-                          chunks(c)%field%energy1,   &
-                          chunks(c)%field%xvel0,     &
-                          chunks(c)%field%xvel1,     &
-                          chunks(c)%field%yvel0,     &
-                          chunks(c)%field%yvel1      )
-  ELSEIF(use_C_kernels)THEN
-    CALL reset_field_kernel_c(chunks(c)%field%x_min, &
-                          chunks(c)%field%x_max,     &
-                          chunks(c)%field%y_min,     &
-                          chunks(c)%field%y_max,     &
-                          chunks(c)%field%density0,  &
-                          chunks(c)%field%density1,  &
-                          chunks(c)%field%energy0,   &
-                          chunks(c)%field%energy1,   &
-                          chunks(c)%field%xvel0,     &
-                          chunks(c)%field%xvel1,     &
-                          chunks(c)%field%yvel0,     &
-                          chunks(c)%field%yvel1      )
-  ENDIF
+  DO c=1,chunks_per_task
+
+    IF(chunks(c)%task.EQ.parallel%task) THEN
+
+      IF(use_fortran_kernels)THEN
+        CALL reset_field_kernel(chunks(c)%field%x_min,   &
+                              chunks(c)%field%x_max,     &
+                              chunks(c)%field%y_min,     &
+                              chunks(c)%field%y_max,     &
+                              chunks(c)%field%density0,  &
+                              chunks(c)%field%density1,  &
+                              chunks(c)%field%energy0,   &
+                              chunks(c)%field%energy1,   &
+                              chunks(c)%field%xvel0,     &
+                              chunks(c)%field%xvel1,     &
+                              chunks(c)%field%yvel0,     &
+                              chunks(c)%field%yvel1      )
+      ELSEIF(use_C_kernels)THEN
+        CALL reset_field_kernel_c(chunks(c)%field%x_min, &
+                              chunks(c)%field%x_max,     &
+                              chunks(c)%field%y_min,     &
+                              chunks(c)%field%y_max,     &
+                              chunks(c)%field%density0,  &
+                              chunks(c)%field%density1,  &
+                              chunks(c)%field%energy0,   &
+                              chunks(c)%field%energy1,   &
+                              chunks(c)%field%xvel0,     &
+                              chunks(c)%field%xvel1,     &
+                              chunks(c)%field%yvel0,     &
+                              chunks(c)%field%yvel1      )
+      ENDIF
+
+    ENDIF
+
+  ENDDO
   IF(profiler_on) profiler%reset=profiler%reset+(timer()-kernel_time)
 
 END SUBROUTINE reset_field

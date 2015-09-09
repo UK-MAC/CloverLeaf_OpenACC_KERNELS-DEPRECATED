@@ -16,7 +16,7 @@
 ! CloverLeaf. If not, see http://www.gnu.org/licenses/.
 
 !>  @brief Fortran timestep kernel
-!>  @author Wayne Gaudin, Andy Herdman
+!>  @author Wayne Gaudin
 !>  @details Calculates the minimum timestep on the mesh chunk based on the CFL
 !>  condition, the velocity gradient and the velocity divergence. A safety
 !>  factor is used to ensure numerical stability.
@@ -82,8 +82,8 @@ SUBROUTINE calc_dt_kernel(x_min,x_max,y_min,y_max,             &
 
   REAL(KIND=8)     :: div,dsx,dsy,dtut,dtvt,dtct,dtdivt,cc,dv1,dv2,jk_control
 
-
   small=0
+
 !$ACC DATA    &
 !$ACC PRESENT(celldx,celldy,cellx,celly,density0,soundspeed,viscosity_a,volume) &
 !$ACC PRESENT(xarea,xvel0,yarea,yvel0,dt_min) &
@@ -136,6 +136,7 @@ SUBROUTINE calc_dt_kernel(x_min,x_max,y_min,y_max,             &
     ENDDO
   ENDDO
 
+
 !$ACC LOOP INDEPENDENT REDUCTION(min:dt_min_val) GANG(128)
   DO k=y_min,y_max
 !$ACC LOOP INDEPENDENT REDUCTION(min:dt_min_val)
@@ -145,7 +146,6 @@ SUBROUTINE calc_dt_kernel(x_min,x_max,y_min,y_max,             &
   ENDDO
 !$ACC END KERNELS
 !$ACC END DATA
-
 
   ! Extract the mimimum timestep information
   dtl_control=10.01*(jk_control-INT(jk_control))

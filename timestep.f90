@@ -25,7 +25,7 @@ MODULE timestep_module
 
 CONTAINS
 
-SUBROUTINE timestep(c)
+SUBROUTINE timestep()
 
   USE clover_module
   USE report_module
@@ -33,6 +33,7 @@ SUBROUTINE timestep(c)
   USE viscosity_module
   USE calc_dt_module
   USE ideal_gas_module
+  USE definitions_module
 
   IMPLICIT NONE
 
@@ -50,12 +51,15 @@ SUBROUTINE timestep(c)
 
   INTEGER :: fields(NUM_FIELDS)
 
+!$ INTEGER :: OMP_GET_THREAD_NUM
 
   dt    = g_big
   small=0
 
   IF(profiler_on) kernel_time=timer()
-  CALL ideal_gas(c,.FALSE.)
+  DO c = 1, chunks_per_task
+    CALL ideal_gas(c,.FALSE.)
+  END DO
   IF(profiler_on) profiler%ideal_gas=profiler%ideal_gas+(timer()-kernel_time)
 
   fields=0
@@ -65,30 +69,32 @@ SUBROUTINE timestep(c)
   fields(FIELD_XVEL0)=1
   fields(FIELD_YVEL0)=1
   IF(profiler_on) kernel_time=timer()
-  CALL update_halo(c,fields,1)
+  CALL update_halo(fields,1)
   IF(profiler_on) profiler%halo_exchange=profiler%halo_exchange+(timer()-kernel_time)
 
   IF(profiler_on) kernel_time=timer()
-  CALL calc_viscosity(c)
+  CALL viscosity()
   IF(profiler_on) profiler%viscosity=profiler%viscosity+(timer()-kernel_time)
 
   fields=0
   fields(FIELD_VISCOSITY)=1
   IF(profiler_on) kernel_time=timer()
-  CALL update_halo(c,fields,1)
+  CALL update_halo(fields,1)
   IF(profiler_on) profiler%halo_exchange=profiler%halo_exchange+(timer()-kernel_time)
 
   IF(profiler_on) kernel_time=timer()
-  CALL calc_dt(c,dtlp,dtl_control,xl_pos,yl_pos,jldt,kldt)
+  DO c = 1, chunks_per_task
+    CALL calc_dt(c,dtlp,dtl_control,xl_pos,yl_pos,jldt,kldt)
 
-  IF(dtlp.LE.dt) THEN
-    dt=dtlp
-    dt_control=dtl_control
-    x_pos=xl_pos
-    y_pos=yl_pos
-    jdt=jldt
-    kdt=kldt
-  ENDIF
+    IF(dtlp.LE.dt) THEN
+      dt=dtlp
+      dt_control=dtl_control
+      x_pos=xl_pos
+      y_pos=yl_pos
+      jdt=jldt
+      kdt=kldt
+    ENDIF
+  END DO
 
   dt = MIN(dt, (dtold * dtrise), dtmax)
 
@@ -98,10 +104,12 @@ SUBROUTINE timestep(c)
   IF(dt.LT.dtmin) small=1
 
   IF (parallel%boss) THEN
+!$  IF(OMP_GET_THREAD_NUM().EQ.0) THEN
       WRITE(g_out,"(' Step ', i7,' time ', f11.7,' control ',a11,' timestep  ',1pe9.2,i8,',',i8,' x ',1pe9.2,' y ',1pe9.2)") &
                       step,time,dt_control,dt,jdt,kdt,x_pos,y_pos
       WRITE(0,"(' Step ', i7,' time ', f11.7,' control ',a11,' timestep  ',1pe9.2,i8,',',i8,' x ',1pe9.2,' y ',1pe9.2)") &
                       step,time,dt_control,dt,jdt,kdt,x_pos,y_pos
+!$  ENDIF
   ENDIF
 
   IF(small.EQ.1) THEN

@@ -23,7 +23,7 @@ MODULE advection_module
 
 CONTAINS
 
-SUBROUTINE advection(c)
+SUBROUTINE advection()
 
   USE clover_module
   USE advec_cell_driver_module
@@ -52,35 +52,13 @@ SUBROUTINE advection(c)
   fields(FIELD_VOL_FLUX_X)=1
   fields(FIELD_VOL_FLUX_Y)=1
   IF(profiler_on) kernel_time=timer()
-  CALL update_halo(c,fields,2)
+  CALL update_halo(fields,2)
   IF(profiler_on) profiler%halo_exchange=profiler%halo_exchange+(timer()-kernel_time)
 
   IF(profiler_on) kernel_time=timer()
-  CALL advec_cell_driver(c,sweep_number,direction)
-  IF(profiler_on) kernel_time=timer()
-
-  fields=0
-  fields(FIELD_DENSITY1)=1
-  fields(FIELD_ENERGY1)=1
-  fields(FIELD_XVEL1)=1
-  fields(FIELD_YVEL1)=1
-  fields(FIELD_MASS_FLUX_X)=1
-  fields(FIELD_MASS_FLUX_y)=1
-  IF(profiler_on) kernel_time=timer()
-  CALL update_halo(c,fields,2)
-  IF(profiler_on) profiler%halo_exchange=profiler%halo_exchange+(timer()-kernel_time)
-
-  IF(profiler_on) kernel_time=timer()
-  CALL advec_mom_driver(c,xvel,direction,sweep_number) 
-  CALL advec_mom_driver(c,yvel,direction,sweep_number) 
-  IF(profiler_on) profiler%mom_advection=profiler%mom_advection+(timer()-kernel_time)
-
-  sweep_number=2
-  IF(advect_x)      direction=g_ydir
-  IF(.not.advect_x) direction=g_xdir
-
-  IF(profiler_on) kernel_time=timer()
-  CALL advec_cell_driver(c,sweep_number,direction)
+  DO c=1,chunks_per_task
+    CALL advec_cell_driver(c,sweep_number,direction)
+  ENDDO
   IF(profiler_on) profiler%cell_advection=profiler%cell_advection+(timer()-kernel_time)
 
   fields=0
@@ -91,12 +69,46 @@ SUBROUTINE advection(c)
   fields(FIELD_MASS_FLUX_X)=1
   fields(FIELD_MASS_FLUX_y)=1
   IF(profiler_on) kernel_time=timer()
-  CALL update_halo(c,fields,2)
+  CALL update_halo(fields,2)
   IF(profiler_on) profiler%halo_exchange=profiler%halo_exchange+(timer()-kernel_time)
 
   IF(profiler_on) kernel_time=timer()
-  CALL advec_mom_driver(c,xvel,direction,sweep_number) 
-  CALL advec_mom_driver(c,yvel,direction,sweep_number) 
+  DO c=1,chunks_per_task
+    CALL advec_mom_driver(c,xvel,direction,sweep_number) 
+  ENDDO
+  DO c=1,chunks_per_task
+    CALL advec_mom_driver(c,yvel,direction,sweep_number) 
+  ENDDO
+  IF(profiler_on) profiler%mom_advection=profiler%mom_advection+(timer()-kernel_time)
+
+  sweep_number=2
+  IF(advect_x)      direction=g_ydir
+  IF(.not.advect_x) direction=g_xdir
+
+  IF(profiler_on) kernel_time=timer()
+  DO c=1,chunks_per_task
+    CALL advec_cell_driver(c,sweep_number,direction)
+  ENDDO
+  IF(profiler_on) profiler%cell_advection=profiler%cell_advection+(timer()-kernel_time)
+
+  fields=0
+  fields(FIELD_DENSITY1)=1
+  fields(FIELD_ENERGY1)=1
+  fields(FIELD_XVEL1)=1
+  fields(FIELD_YVEL1)=1
+  fields(FIELD_MASS_FLUX_X)=1
+  fields(FIELD_MASS_FLUX_y)=1
+  IF(profiler_on) kernel_time=timer()
+  CALL update_halo(fields,2)
+  IF(profiler_on) profiler%halo_exchange=profiler%halo_exchange+(timer()-kernel_time)
+
+  IF(profiler_on) kernel_time=timer()
+  DO c=1,chunks_per_task
+    CALL advec_mom_driver(c,xvel,direction,sweep_number) 
+  ENDDO
+  DO c=1,chunks_per_task
+    CALL advec_mom_driver(c,yvel,direction,sweep_number) 
+  ENDDO
   IF(profiler_on) profiler%mom_advection=profiler%mom_advection+(timer()-kernel_time)
 
 END SUBROUTINE advection

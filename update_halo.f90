@@ -24,7 +24,7 @@ MODULE update_halo_module
 
 CONTAINS
 
-SUBROUTINE update_halo(c,fields,depth)
+SUBROUTINE update_halo(fields,depth)
 
   USE clover_module
   USE update_halo_kernel_module
@@ -35,28 +35,60 @@ SUBROUTINE update_halo(c,fields,depth)
 
   CALL clover_exchange(fields,depth)
 
-  CALL update_halo_kernel(chunks(c)%field%x_min,          &
-                          chunks(c)%field%x_max,          &
-                          chunks(c)%field%y_min,          &
-                          chunks(c)%field%y_max,          &
-                          chunks(c)%chunk_neighbours,     &
-                          chunks(c)%field%density0,       &
-                          chunks(c)%field%energy0,        &
-                          chunks(c)%field%pressure,       &
-                          chunks(c)%field%viscosity,      &
-                          chunks(c)%field%soundspeed,     &
-                          chunks(c)%field%density1,       &
-                          chunks(c)%field%energy1,        &
-                          chunks(c)%field%xvel0,          &
-                          chunks(c)%field%yvel0,          &
-                          chunks(c)%field%xvel1,          &
-                          chunks(c)%field%yvel1,          &
-                          chunks(c)%field%vol_flux_x,     &
-                          chunks(c)%field%vol_flux_y,     &
-                          chunks(c)%field%mass_flux_x,    &
-                          chunks(c)%field%mass_flux_y,    &
-                          fields,                         &
-                          depth                           )
+  DO c=1,chunks_per_task
+
+    IF(chunks(c)%task.EQ.parallel%task) THEN
+
+      IF(use_fortran_kernels)THEN
+        CALL update_halo_kernel(chunks(c)%field%x_min,          &
+                                chunks(c)%field%x_max,          &
+                                chunks(c)%field%y_min,          &
+                                chunks(c)%field%y_max,          &
+                                chunks(c)%chunk_neighbours,     &
+                                chunks(c)%field%density0,       &
+                                chunks(c)%field%energy0,        &
+                                chunks(c)%field%pressure,       &
+                                chunks(c)%field%viscosity,      &
+                                chunks(c)%field%soundspeed,     &
+                                chunks(c)%field%density1,       &
+                                chunks(c)%field%energy1,        &
+                                chunks(c)%field%xvel0,          &
+                                chunks(c)%field%yvel0,          &
+                                chunks(c)%field%xvel1,          &
+                                chunks(c)%field%yvel1,          &
+                                chunks(c)%field%vol_flux_x,     &
+                                chunks(c)%field%vol_flux_y,     &
+                                chunks(c)%field%mass_flux_x,    &
+                                chunks(c)%field%mass_flux_y,    &
+                                fields,                         &
+                                depth                           )
+      ELSEIF(use_C_kernels)THEN
+        CALL update_halo_kernel_c(chunks(c)%field%x_min,        &
+                                chunks(c)%field%x_max,          &
+                                chunks(c)%field%y_min,          &
+                                chunks(c)%field%y_max,          &
+                                chunks(c)%chunk_neighbours,     &
+                                chunks(c)%field%density0,       &
+                                chunks(c)%field%energy0,        &
+                                chunks(c)%field%pressure,       &
+                                chunks(c)%field%viscosity,      &
+                                chunks(c)%field%soundspeed,     &
+                                chunks(c)%field%density1,       &
+                                chunks(c)%field%energy1,        &
+                                chunks(c)%field%xvel0,          &
+                                chunks(c)%field%yvel0,          &
+                                chunks(c)%field%xvel1,          &
+                                chunks(c)%field%yvel1,          &
+                                chunks(c)%field%vol_flux_x,     &
+                                chunks(c)%field%vol_flux_y,     &
+                                chunks(c)%field%mass_flux_x,    &
+                                chunks(c)%field%mass_flux_y,    &
+                                fields,                         &
+                                depth                           )
+      ENDIF
+    ENDIF
+
+  ENDDO
 
 END SUBROUTINE update_halo
 

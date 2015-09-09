@@ -16,7 +16,7 @@
 ! CloverLeaf. If not, see http://www.gnu.org/licenses/.
 
 !>  @brief Fortran cell advection kernel.
-!>  @author Wayne Gaudin, Andy Herdman
+!>  @author Wayne Gaudin
 !>  @details Performs a second order advective remap using van-Leer limiting
 !>  with directional splitting.
 
@@ -76,6 +76,8 @@ SUBROUTINE advec_cell_kernel(x_min,       &
   REAL(KIND=8) :: wind,sigma,sigmat,sigmav,sigmam,sigma3,sigma4
   REAL(KIND=8) :: diffuw,diffdw,limiter
   REAL(KIND=8) :: one_by_six=1.0_8/6.0_8
+
+
 !$ACC DATA &
 !$ACC PRESENT(density1,energy1) &
 !$ACC PRESENT(vol_flux_x,vol_flux_y,volume,mass_flux_x,mass_flux_y,vertexdx,vertexdy) &
@@ -95,6 +97,8 @@ SUBROUTINE advec_cell_kernel(x_min,       &
         ENDDO
       ENDDO 
     ELSE
+
+
 !$ACC LOOP INDEPENDENT
       DO k=y_min-2,y_max+2
 !$ACC LOOP INDEPENDENT
@@ -103,7 +107,9 @@ SUBROUTINE advec_cell_kernel(x_min,       &
           post_vol(j,k)=volume(j,k)
         ENDDO
       ENDDO 
+
     ENDIF
+
 
 !$ACC LOOP INDEPENDENT
     DO k=y_min,y_max
@@ -158,6 +164,8 @@ SUBROUTINE advec_cell_kernel(x_min,       &
       ENDDO
     ENDDO
 
+
+
 !$ACC LOOP INDEPENDENT
     DO k=y_min,y_max
 !$ACC LOOP INDEPENDENT
@@ -171,9 +179,11 @@ SUBROUTINE advec_cell_kernel(x_min,       &
       ENDDO
     ENDDO
 
+
   ELSEIF(dir.EQ.g_ydir) THEN
 
     IF(sweep_number.EQ.1)THEN
+
 !$ACC LOOP INDEPENDENT
       DO k=y_min-2,y_max+2
 !$ACC LOOP INDEPENDENT
@@ -182,7 +192,9 @@ SUBROUTINE advec_cell_kernel(x_min,       &
           post_vol(j,k)=pre_vol(j,k)-(vol_flux_y(j  ,k+1)-vol_flux_y(j,k))
         ENDDO
       ENDDO
+
     ELSE
+
 !$ACC LOOP INDEPENDENT
       DO k=y_min-2,y_max+2
 !$ACC LOOP INDEPENDENT
@@ -191,6 +203,7 @@ SUBROUTINE advec_cell_kernel(x_min,       &
           post_vol(j,k)=volume(j,k)
         ENDDO
       ENDDO
+
     ENDIF
 
 !$ACC LOOP INDEPENDENT
@@ -244,6 +257,8 @@ SUBROUTINE advec_cell_kernel(x_min,       &
 
       ENDDO
     ENDDO
+
+
 
 !$ACC LOOP INDEPENDENT
     DO k=y_min,y_max

@@ -16,7 +16,7 @@
 ! CloverLeaf. If not, see http://www.gnu.org/licenses/.
 
 !>  @brief Fortran PdV kernel.
-!>  @author Wayne Gaudin, Andy Herdman
+!>  @author Wayne Gaudin
 !>  @details Calculates the change in energy and density in a cell using the
 !>  change on cell volume due to the velocity gradients in a cell. The time
 !>  level of the velocity data depends on whether it is invoked as the
@@ -107,11 +107,12 @@ SUBROUTINE PdV_kernel(predict,                                          &
 !$ACC END KERNELS
 
   ELSE
-
 !$ACC KERNELS
+
+
 !$ACC LOOP INDEPENDENT
     DO k=y_min,y_max
-!$ACC  LOOP INDEPENDENT PRIVATE(right_flux,left_flux,top_flux,bottom_flux,total_flux,min_cell_volume,energy_change,recip_volume)
+!$ACC LOOP INDEPENDENT PRIVATE(right_flux,left_flux,top_flux,bottom_flux,total_flux,min_cell_volume,energy_change,recip_volume)
       DO j=x_min,x_max
 
         left_flux=  (xarea(j  ,k  )*(xvel0(j  ,k  )+xvel0(j  ,k+1)                     &
@@ -140,11 +141,11 @@ SUBROUTINE PdV_kernel(predict,                                          &
 
       ENDDO
     ENDDO
+
 !$ACC END KERNELS
-
   ENDIF
-
 !$ACC END DATA
+
 
 END SUBROUTINE PdV_kernel
 

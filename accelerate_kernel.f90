@@ -16,7 +16,7 @@
 ! CloverLeaf. If not, see http://www.gnu.org/licenses/.
 
 !>  @brief Fortran acceleration kernel
-!>  @author Wayne Gaudin, Andy Herdman
+!>  @author Wayne Gaudin
 !>  @details The pressure and viscosity gradients are used to update the 
 !>  velocity field.
 
@@ -87,6 +87,7 @@ SUBROUTINE accelerate_kernel(x_min,x_max,y_min,y_max,dt,     &
     ENDDO
   ENDDO
 
+
 !$ACC LOOP INDEPENDENT
   DO k=y_min,y_max+1
 !$ACC LOOP INDEPENDENT
@@ -97,6 +98,7 @@ SUBROUTINE accelerate_kernel(x_min,x_max,y_min,y_max,dt,     &
 
     ENDDO
   ENDDO
+
 
 !$ACC LOOP INDEPENDENT
   DO k=y_min,y_max+1
@@ -109,6 +111,8 @@ SUBROUTINE accelerate_kernel(x_min,x_max,y_min,y_max,dt,     &
     ENDDO
   ENDDO
 
+
+
 !$ACC LOOP INDEPENDENT
   DO k=y_min,y_max+1
 !$ACC LOOP INDEPENDENT
@@ -119,7 +123,6 @@ SUBROUTINE accelerate_kernel(x_min,x_max,y_min,y_max,dt,     &
 
     ENDDO
   ENDDO
-
 !$ACC END KERNELS
 !$ACC WAIT
 

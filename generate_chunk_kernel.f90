@@ -16,7 +16,7 @@
 ! CloverLeaf. If not, see http://www.gnu.org/licenses/.
 
 !>  @brief Fortran mesh chunk generator
-!>  @author Wayne Gaudin, Andy Herdman
+!>  @author Wayne Gaudin
 !>  @details Generates the field data on a mesh chunk based on the user specified
 !>  input for the states.
 !>
@@ -86,13 +86,11 @@ SUBROUTINE generate_chunk_kernel(x_min,x_max,y_min,y_max, &
 !$ACC KERNELS
 !$ACC LOOP INDEPENDENT
   DO k=y_min-2,y_max+2
-!$ACC LOOP INDEPENDENT
     DO j=x_min-2,x_max+2
       energy0(j,k)=state_energy(1)
     ENDDO
   ENDDO
-!$ACC END KERNELS
-!$ACC KERNELS
+
 !$ACC LOOP INDEPENDENT
   DO k=y_min-2,y_max+2
 !$ACC LOOP INDEPENDENT
@@ -100,8 +98,7 @@ SUBROUTINE generate_chunk_kernel(x_min,x_max,y_min,y_max, &
       density0(j,k)=state_density(1)
     ENDDO
   ENDDO
-!$ACC END KERNELS
-!$ACC KERNELS
+
 !$ACC LOOP INDEPENDENT
   DO k=y_min-2,y_max+2
 !$ACC LOOP INDEPENDENT
@@ -109,8 +106,7 @@ SUBROUTINE generate_chunk_kernel(x_min,x_max,y_min,y_max, &
       xvel0(j,k)=state_xvel(1)
     ENDDO
   ENDDO
-!$ACC END KERNELS
-!$ACC KERNELS
+
 !$ACC LOOP INDEPENDENT
   DO k=y_min-2,y_max+2
 !$ACC LOOP INDEPENDENT
@@ -129,7 +125,7 @@ SUBROUTINE generate_chunk_kernel(x_min,x_max,y_min,y_max, &
 !$ACC KERNELS
 !$ACC LOOP INDEPENDENT
     DO k=y_min-2,y_max+2
-!$ACC LOOP INDEPENDENT PRIVATE(RADIUS)
+!$ACC LOOP INDEPENDENT PRIVATE(RADIUS,jt,kt)
       DO j=x_min-2,x_max+2
         IF(state_geometry(state).EQ.g_rect ) THEN
           IF(vertexx(j+1).GE.state_xmin(state).AND.vertexx(j).LT.state_xmax(state)) THEN
@@ -170,6 +166,8 @@ SUBROUTINE generate_chunk_kernel(x_min,x_max,y_min,y_max, &
         ENDIF
       ENDDO
     ENDDO
+
+
 !$ACC END KERNELS
 
   ENDDO

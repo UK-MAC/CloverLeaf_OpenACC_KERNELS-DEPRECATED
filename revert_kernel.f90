@@ -16,7 +16,7 @@
 ! CloverLeaf. If not, see http://www.gnu.org/licenses/.
 
 !>  @brief Fortran revert kernel.
-!>  @author Wayne Gaudin, Andy Herdman
+!>  @author Wayne Gaudin
 !>  @details Takes the half step field data used in the predictor and reverts
 !>  it to the start of step data, ready for the corrector.
 !>  Note that this does not seem necessary in this proxy-app but should be
@@ -39,8 +39,7 @@ SUBROUTINE revert_kernel(x_min,x_max,y_min,y_max,density0,density1,energy0,energ
   INTEGER :: j,k
 
 !$ACC DATA &
-!$ACC PRESENT(density0,density1,energy0,energy1)
-
+!$ACC PRESENT(density0,energy0,density1,energy1)
 !$ACC KERNELS
 !$ACC LOOP INDEPENDENT
   DO k=y_min,y_max
@@ -49,9 +48,8 @@ SUBROUTINE revert_kernel(x_min,x_max,y_min,y_max,density0,density1,energy0,energ
       density1(j,k)=density0(j,k)
     ENDDO
   ENDDO
-!$ACC END KERNELS
 
-!$ACC KERNELS
+
 !$ACC LOOP INDEPENDENT
   DO k=y_min,y_max
 !$ACC LOOP INDEPENDENT
@@ -59,8 +57,8 @@ SUBROUTINE revert_kernel(x_min,x_max,y_min,y_max,density0,density1,energy0,energ
       energy1(j,k)=energy0(j,k)
     ENDDO
   ENDDO
-!$ACC END KERNELS
 
+!$ACC END KERNELS
 !$ACC END DATA
 
 END SUBROUTINE revert_kernel

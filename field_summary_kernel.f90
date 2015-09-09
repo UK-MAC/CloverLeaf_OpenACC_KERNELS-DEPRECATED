@@ -16,7 +16,7 @@
 ! CloverLeaf. If not, see http://www.gnu.org/licenses/.
 
 !>  @brief Fortran field summary kernel
-!>  @author Wayne Gaudin, Andy Herdman
+!>  @author Wayne Gaudin
 !>  @details The total mass, internal energy, kinetic energy and volume weighted
 !>  pressure for the chunk is calculated.
 

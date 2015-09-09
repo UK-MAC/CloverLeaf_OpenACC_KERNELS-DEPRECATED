@@ -16,7 +16,7 @@
 ! CloverLeaf. If not, see http://www.gnu.org/licenses/.
 
 !>  @brief Fortran ideal gas kernel.
-!>  @author Wayne Gaudin, Andy Herdman
+!>  @author Wayne Gaudin
 !>  @details Calculates the pressure and sound speed for the mesh chunk using
 !>  the ideal gas equation of state, with a fixed gamma of 1.4.
 

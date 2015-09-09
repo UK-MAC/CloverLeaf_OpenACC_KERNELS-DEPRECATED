@@ -16,7 +16,7 @@
 ! CloverLeaf. If not, see http://www.gnu.org/licenses/.
 
 !>  @brief Fortran flux kernel.
-!>  @author Wayne Gaudin, Andy Herdman
+!>  @author Wayne Gaudin
 !>  @details The edge volume fluxes are calculated based on the velocity fields.
 
 MODULE flux_calc_kernel_module
@@ -58,9 +58,7 @@ SUBROUTINE flux_calc_kernel(x_min,x_max,y_min,y_max,dt,              &
                      *(xvel0(j,k)+xvel0(j,k+1)+xvel1(j,k)+xvel1(j,k+1))
     ENDDO
   ENDDO
-!$ACC END KERNELS
 
-!$ACC KERNELS
 !$ACC LOOP INDEPENDENT
   DO k=y_min,y_max+1
 !$ACC LOOP INDEPENDENT
@@ -72,6 +70,7 @@ SUBROUTINE flux_calc_kernel(x_min,x_max,y_min,y_max,dt,              &
 !$ACC END KERNELS
 
 !$ACC END DATA
+
 
 END SUBROUTINE flux_calc_kernel
 

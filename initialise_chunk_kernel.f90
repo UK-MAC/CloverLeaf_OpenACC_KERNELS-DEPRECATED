@@ -16,7 +16,7 @@
 ! CloverLeaf. If not, see http://www.gnu.org/licenses/.
 
 !>  @brief Fortran chunk initialisation kernel.
-!>  @author Wayne Gaudin, Andy Herdman
+!>  @author Wayne Gaudin
 !>  @details Calculates mesh geometry for the mesh chunk based on the mesh size.
 
 MODULE initialise_chunk_kernel_module
@@ -61,68 +61,57 @@ SUBROUTINE initialise_chunk_kernel(x_min,x_max,y_min,y_max,       &
   DO j=x_min-2,x_max+3
      vertexx(j)=xmin+dx*float(j-x_min)
   ENDDO
-!$ACC END KERNELS
 
-!$ACC KERNELS
 !$ACC LOOP INDEPENDENT
   DO j=x_min-2,x_max+3
     vertexdx(j)=dx
   ENDDO
-!$ACC END KERNELS
 
-!$ACC KERNELS
+
 !$ACC LOOP INDEPENDENT
   DO k=y_min-2,y_max+3
      vertexy(k)=ymin+dy*float(k-y_min)
   ENDDO
-!$ACC END KERNELS
 
-!$ACC KERNELS
+
 !$ACC LOOP INDEPENDENT
   DO k=y_min-2,y_max+3
     vertexdy(k)=dy
   ENDDO
-!$ACC END KERNELS
 
-!$ACC KERNELS
+
 !$ACC LOOP INDEPENDENT
   DO j=x_min-2,x_max+2
      cellx(j)=0.5*(vertexx(j)+vertexx(j+1))
   ENDDO
-!$ACC END KERNELS
 
-!$ACC KERNELS
+
 !$ACC LOOP INDEPENDENT
   DO j=x_min-2,x_max+2
      celldx(j)=dx
   ENDDO
-!$ACC END KERNELS
 
-!$ACC KERNELS
+
 !$ACC LOOP INDEPENDENT
   DO k=y_min-2,y_max+2
      celly(k)=0.5*(vertexy(k)+vertexy(k+1))
   ENDDO
-!$ACC END KERNELS
 
-!$ACC KERNELS
+
 !$ACC LOOP INDEPENDENT
   DO k=y_min-2,y_max+2
      celldy(k)=dy
   ENDDO
-!$ACC END KERNELS
 
-!$ACC KERNELS
+
 !$ACC LOOP INDEPENDENT
   DO k=y_min-2,y_max+2
-!$ACC LOOP INDEPENDENT
     DO j=x_min-2,x_max+2
         volume(j,k)=dx*dy
      ENDDO
   ENDDO
-!$ACC END KERNELS
 
-!$ACC KERNELS
+
 !$ACC LOOP INDEPENDENT
   DO k=y_min-2,y_max+2
 !$ACC LOOP INDEPENDENT
@@ -130,9 +119,8 @@ SUBROUTINE initialise_chunk_kernel(x_min,x_max,y_min,y_max,       &
         xarea(j,k)=celldy(k)
      ENDDO
   ENDDO
-!$ACC END KERNELS
 
-!$ACC KERNELS
+
 !$ACC LOOP INDEPENDENT
   DO k=y_min-2,y_max+2
 !$ACC LOOP INDEPENDENT
@@ -142,6 +130,7 @@ SUBROUTINE initialise_chunk_kernel(x_min,x_max,y_min,y_max,       &
   ENDDO
 !$ACC END KERNELS
 !$ACC END DATA
+
 
 END SUBROUTINE initialise_chunk_kernel
 

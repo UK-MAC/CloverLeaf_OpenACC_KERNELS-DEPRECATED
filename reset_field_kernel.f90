@@ -16,7 +16,7 @@
 ! CloverLeaf. If not, see http://www.gnu.org/licenses/.
 
 !>  @brief Fortran reset field kernel.
-!>  @author Wayne Gaudin, Andy Herdman
+!>  @author Wayne Gaudin
 !>  @details Copies all of the final end of step filed data to the begining of
 !>  step data, ready for the next timestep.
 
@@ -45,7 +45,8 @@ SUBROUTINE reset_field_kernel(x_min,x_max,y_min,y_max,    &
   INTEGER :: j,k
 
 !$ACC DATA &
-!$ACC PRESENT(density0,energy0,density1,energy1,xvel0,yvel0,xvel1,yvel1)
+!$ACC PRESENT(density0,density1,energy0,energy1,xvel0,xvel1,yvel0,yvel1)
+
 !$ACC KERNELS
 !$ACC LOOP INDEPENDENT
   DO k=y_min,y_max
@@ -54,9 +55,7 @@ SUBROUTINE reset_field_kernel(x_min,x_max,y_min,y_max,    &
         density0(j,k)=density1(j,k)
      ENDDO
   ENDDO
-!$ACC END KERNELS
 
-!$ACC KERNELS
 !$ACC LOOP INDEPENDENT
   DO k=y_min,y_max
 !$ACC LOOP INDEPENDENT
@@ -64,9 +63,7 @@ SUBROUTINE reset_field_kernel(x_min,x_max,y_min,y_max,    &
         energy0(j,k)=energy1(j,k)
      ENDDO
   ENDDO
-!$ACC END KERNELS
 
-!$ACC KERNELS
 !$ACC LOOP INDEPENDENT
   DO k=y_min,y_max+1
 !$ACC LOOP INDEPENDENT
@@ -74,9 +71,7 @@ SUBROUTINE reset_field_kernel(x_min,x_max,y_min,y_max,    &
         xvel0(j,k)=xvel1(j,k)
      ENDDO
   ENDDO
-!$ACC END KERNELS
 
-!$ACC KERNELS
 !$ACC LOOP INDEPENDENT
   DO k=y_min,y_max+1
 !$ACC LOOP INDEPENDENT
@@ -84,7 +79,9 @@ SUBROUTINE reset_field_kernel(x_min,x_max,y_min,y_max,    &
         yvel0(j,k)=yvel1(j,k)
      ENDDO
   ENDDO
+
 !$ACC END KERNELS
+
 !$ACC END DATA
 
 END SUBROUTINE reset_field_kernel

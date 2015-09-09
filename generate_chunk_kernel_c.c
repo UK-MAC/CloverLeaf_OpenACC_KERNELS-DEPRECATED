@@ -18,7 +18,8 @@
 /**
  *  @brief C mesh chunk generator
  *  @author Wayne Gaudin
- *  @details Still just a stub.
+ *  @details Generates the field data on a mesh chunk based on the user specified
+ *  input for the states.
  *   
  *  Note that state one is always used as the background state, which is then
  *  overwritten by further state definitions.
@@ -68,8 +69,10 @@ void generate_chunk_kernel_c_(int *xmin,int *xmax,int *ymin,int *ymax,
 
   int j,k,jt,kt;
 
+#pragma omp parallel
  {
   /* State 1 is always the background state */
+#pragma omp for private(j,k)
   for (k=y_min-2;k<=y_max+2;k++) {
 #pragma ivdep
     for (j=x_min-2;j<=x_max+2;j++) {
@@ -77,6 +80,7 @@ void generate_chunk_kernel_c_(int *xmin,int *xmax,int *ymin,int *ymax,
     }
   }
 
+#pragma omp for private(j,k)
   for (k=y_min-2;k<=y_max+2;k++) {
 #pragma ivdep
     for (j=x_min-2;j<=x_max+2;j++) {
@@ -84,6 +88,7 @@ void generate_chunk_kernel_c_(int *xmin,int *xmax,int *ymin,int *ymax,
    }
   }
 
+#pragma omp for private(j,k)
   for (k=y_min-2;k<=y_max+2;k++) {
 #pragma ivdep
     for (j=x_min-2;j<=x_max+2;j++) {
@@ -91,6 +96,7 @@ void generate_chunk_kernel_c_(int *xmin,int *xmax,int *ymin,int *ymax,
    }
   }
 
+#pragma omp for private(j,k)
   for (k=y_min-2;k<=y_max+2;k++) {
 #pragma ivdep
     for (j=x_min-2;j<=x_max+2;j++) {
@@ -104,6 +110,7 @@ void generate_chunk_kernel_c_(int *xmin,int *xmax,int *ymin,int *ymax,
     x_cent=state_xmin[FTNREF1D(state,1)];
     y_cent=state_ymin[FTNREF1D(state,1)];
 
+#pragma omp for private(radius,j,k)
     for (k=y_min-2;k<=y_max+2;k++) {
 #pragma ivdep
       for (j=x_min-2;j<=x_max+2;j++) {
